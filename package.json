@@ -1,0 +1,32 @@
+{
+  "memberName": "secretsanta",
+  "version": "1.0.0",
+  "description": "Secret Santa app to draw memberNames for determining who your secret santa is.",
+  "main": "index.js",
+  "scripts": {
+    "start:api": "./node_modules/.bin/nodemon server/index.js",
+    "test": "jest --watchAll",
+    "coverage": "npm run test -- --coverage",
+    "coverage:report": "open -a Google\\ Chrome ./coverage/lcov-report/index.html",
+    "lint": "eslint --config .eslintrc.js .",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.344.0",
+    "koa": "^2.6.1",
+    "koa-body": "^4.0.4",
+    "koa-bodyparser": "^4.2.1",
+    "koa-router": "^7.4.0",
+    "nodemon": "^1.18.5"
+  },
+  "devDependencies": {
+    "eslint": "^5.8.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.2",
+    "eslint-plugin-react": "^7.11.1",
+    "jest": "^23.6.0"
+  }
+}
