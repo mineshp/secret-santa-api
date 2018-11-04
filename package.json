@@ -19,7 +19,8 @@
     "koa-body": "^4.0.4",
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0",
-    "nodemon": "^1.18.5"
+    "nodemon": "^1.18.5",
+    "serverless-http": "^1.8.0"
   },
   "devDependencies": {
     "eslint": "^5.8.0",
