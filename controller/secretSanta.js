@@ -9,7 +9,7 @@ const {
   getMySecretSanta,
 } = require('../db/secretSanta');
 
-const TableName = 'secretSanta';
+const TableName = process.env.SECRET_SANTA_TABLE;
 
 const setupgroupID = async (ctx) => {
   const { groupID } = ctx.params;

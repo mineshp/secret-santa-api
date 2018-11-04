@@ -31,8 +31,6 @@ app.on('error', (err) => {
   console.log('server error', err);
 });
 
-// const { PORT = 4001 } = process.env;
-// .listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
 app.use(router.routes());
 
 module.exports.handler = serverless(app);
