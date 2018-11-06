@@ -19,7 +19,7 @@ app.use(koaBody());
 app.use(bodyParser());
 
 const router = new Router();
-router.get('/', (ctx) => { ctx.body = 'Welcome to secretSanta'; });
+router.get('/api', (ctx) => { ctx.body = 'Welcome to secretSanta api'; });
 
 router.post('/api/secretsanta/setup/:groupID', setupgroupID);
 router.get('/api/secretsanta/draw/:groupID', drawNames);

@@ -38,9 +38,10 @@ const setupgroupID = async (ctx) => {
   ctx.body = save ? JSON.stringify({ ok: 1 }) : JSON.stringify({ error: 'Failed to save item' });
 };
 
-const addGiftIdeas = (ctx) => {
+const addGiftIdeas = async (ctx) => {
   const { memberName, groupID } = ctx.params;
   const { giftIdeas } = ctx.request.body;
+
   if (giftIdeas.length < 1) ctx.response.status = 404;
 
   const payload = {
@@ -50,10 +51,10 @@ const addGiftIdeas = (ctx) => {
     giftIdeas
   };
 
-  ctx.body = addGiftIdeasForMember(payload);
+  ctx.body = await addGiftIdeasForMember(payload);
 };
 
-const addExclusions = (ctx) => {
+const addExclusions = async (ctx) => {
   const { memberName, groupID } = ctx.params;
   const { exclusions } = ctx.request.body;
 
@@ -66,26 +67,17 @@ const addExclusions = (ctx) => {
     exclusions
   };
 
-  ctx.body = addExclusionForMember(payload);
+  ctx.body = await addExclusionForMember(payload);
 };
 
 const drawNames = async (ctx) => {
   const { groupID } = ctx.params;
-  const secretSantaGroupMembersInfo = await getMembersFromgroupID({ TableName: 'secretSanta', groupID });
+  const secretSantaGroupMembersInfo = await getMembersFromgroupID({ TableName, groupID });
 
   const namesInHat = getListOfNames(secretSantaGroupMembersInfo);
   const results = generateDraw(namesInHat, Object.assign([], namesInHat), secretSantaGroupMembersInfo);
 
-  await results.forEach(({ memberName, secretSanta }) => {
-    setSecretSantaForMember({
-      TableName,
-      memberName,
-      groupID,
-      secretSanta
-    });
-  });
-
-  ctx.body = { ok: 1 };
+  ctx.body = await setSecretSantaForMember({ TableName, results, groupID });
 };
 
 const getSecretSanta = async (ctx) => {

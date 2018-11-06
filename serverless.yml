@@ -19,6 +19,9 @@ provider:
         - dynamodb:DeleteItem
       Resource:
         - { "Fn::GetAtt": ["DynamoDBTable", "Arn" ] }
+        - { "Fn::Join": [ "/", [
+            { "Fn::GetAtt": ["DynamoDBTable", "Arn" ] }, "index", "groupID-index"
+          ] ] }
   environment:
     SECRET_SANTA_TABLE: ${self:custom.tableName}
 
@@ -51,4 +54,14 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+        - IndexName: groupID-index
+          KeySchema:
+          - AttributeName: groupID
+            KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
         TableName: ${self:custom.tableName}

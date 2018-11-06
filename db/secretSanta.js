@@ -1,10 +1,11 @@
 const { dbClient } = require('./dbClient');
 
-const setupSecretSantagroupID = ({ TableName, secretSantagroupID }) => secretSantagroupID.map((member) => dbClient.put({
-  TableName,
-  Item: { ...member }
-}).promise()
-);
+const setupSecretSantagroupID = ({ TableName, secretSantagroupID }) => Promise.all(
+  secretSantagroupID.map((member) => dbClient.put({
+    TableName,
+    Item: { ...member }
+  }).promise()
+  ));
 
 const addGiftIdeasForMember = ({
   TableName, memberName, groupID, giftIdeas
@@ -22,7 +23,6 @@ const addGiftIdeasForMember = ({
   };
 
   return dbClient.update(params).promise()
-    .then((data) => JSON.stringify(data))
     .catch((e) => console.log(e) || JSON.stringify({ error: e }));
 };
 
@@ -42,7 +42,6 @@ const addExclusionForMember = ({
   };
 
   return dbClient.update(params).promise()
-    .then((data) => JSON.stringify(data))
     .catch((e) => console.log(e) || JSON.stringify({ error: e }));
 };
 
@@ -63,25 +62,26 @@ const getMembersFromgroupID = async ({ TableName, groupID }) => {
   }
 };
 
-const setSecretSantaForMember = ({
-  TableName, memberName, groupID, secretSanta
-}) => {
-  const params = {
-    TableName,
-    Key: {
-      memberName,
-      groupID
-    },
-    UpdateExpression: 'set secretSanta = :santa',
-    ExpressionAttributeValues: {
-      ':santa': secretSanta,
-    }
-  };
+const setSecretSantaForMember = ({ TableName, results, groupID }) => Promise.all(
+  results.map(({ memberName, secretSanta }) => {
+    const params = {
+      TableName,
+      Key: {
+        memberName,
+        groupID
+      },
+      UpdateExpression: 'set secretSanta = :santa',
+      ExpressionAttributeValues: {
+        ':santa': secretSanta,
+      }
+    };
 
-  return dbClient.update(params).promise()
-    .then((data) => JSON.stringify(data))
-    .catch((e) => console.log(e) || JSON.stringify({ error: e }));
-};
+    return dbClient.update(params).promise()
+      .then((data) => JSON.stringify(data))
+      .catch((error) => JSON.stringify({ error }));
+  })
+);
+
 
 const getMySecretSanta = async ({ TableName, memberName, groupID }) => {
   const params = {

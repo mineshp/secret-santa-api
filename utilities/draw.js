@@ -4,17 +4,17 @@ const remove = (name, list) => list.filter((i) => i !== name);
 
 const getRandomName = (list) => list[Math.floor(Math.random() * list.length)];
 
-let filteredList;
 const pickAName = (memberName, namesList, exclusions) => {
-  filteredList = remove(memberName, namesList);
-  // const hasExclusion = exclusions.find((group) => group.name === memberName);
+  const filteredList = remove(memberName, namesList);
 
   let filteredListIncExclusions;
-  if (exclusions && exclusions.length > 0) {
+  if (exclusions && exclusions.length) {
+    // eslint-disable-next-line no-return-assign
     exclusions.map((name) => filteredListIncExclusions = remove(name, filteredList));
   }
 
   return exclusions
+    && exclusions.length
     ? getRandomName(filteredListIncExclusions)
     : getRandomName(filteredList);
 };
