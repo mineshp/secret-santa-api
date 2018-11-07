@@ -3,6 +3,8 @@ const Koa = require('koa');
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const koaBody = require('koa-body');
+const cors = require('@koa/cors');
+const convert = require('koa-convert');
 
 const {
   setupgroupID,
@@ -14,12 +16,24 @@ const {
 
 const app = new Koa();
 
-// body parser
+const whitelist = process.env.WHITELIST.split(',');
+
+const checkOriginAgainstWhitelist = (ctx) => {
+  const requestOrigin = ctx.accept.headers.origin;
+  if (!whitelist.includes(requestOrigin)) {
+    return ctx.throw(`🙈 ${requestOrigin} is not a valid origin`);
+  }
+  return requestOrigin;
+};
+
+app.use(convert(cors({ origin: checkOriginAgainstWhitelist })));
 app.use(koaBody());
 app.use(bodyParser());
 
 const router = new Router();
-router.get('/api', (ctx) => { ctx.body = 'Welcome to secretSanta api'; });
+router.get('/api', (ctx) => {
+  ctx.body = JSON.stringify({ message: 'Welcome to secretSanta api' });
+});
 
 router.post('/api/secretsanta/setup/:groupID', setupgroupID);
 router.get('/api/secretsanta/draw/:groupID', drawNames);
