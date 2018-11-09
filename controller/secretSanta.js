@@ -2,6 +2,7 @@ const { isValidgroupID } = require('../validator');
 const { getListOfNames, generateDraw } = require('../utilities/draw');
 const {
   setupSecretSantagroupID,
+  getGiftIdeasForMember,
   addGiftIdeasForMember,
   addExclusionForMember,
   getMembersFromgroupID,
@@ -37,6 +38,19 @@ const setupgroupID = async (ctx) => {
 
   ctx.body = save ? JSON.stringify({ ok: 1 }) : JSON.stringify({ error: 'Failed to save item' });
 };
+
+const getGiftIdeas = async (ctx) => {
+  const { memberName, groupID } = ctx.params;
+
+  const payload = {
+    TableName,
+    memberName,
+    groupID
+  };
+
+  ctx.body = await getGiftIdeasForMember(payload);
+};
+
 
 const addGiftIdeas = async (ctx) => {
   const { memberName, groupID } = ctx.params;
@@ -91,5 +105,6 @@ module.exports = {
   addGiftIdeas,
   addExclusions,
   drawNames,
-  getSecretSanta
+  getSecretSanta,
+  getGiftIdeas
 };

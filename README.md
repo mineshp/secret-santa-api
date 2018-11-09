@@ -29,6 +29,11 @@ Data
 [{"memberName":"name1","email":"emailAddress"},{"memberName":"name2","email":"emailAddress"}]
 ```
 
+## Get GiftIdeas for a member
+Get gift ideas for a member
+
+```curl -H "Content-Type: application/json" -X GET ${BASE_URL}/api/secretsanta/giftIdeas/ryan/avengers'```
+
 ## Add GiftIdeas for a member
 Add gift ideas, so your secret santa has some ideas of what you might prefer to get.
 
@@ -38,6 +43,8 @@ Data
 ```
 
 ```curl -H "Content-Type: application/json" -X PUT ${BASE_URL}/api/secretsanta/giftIdeas/ryan/avengers -d '{"giftIdeas":["socks","candles","toys"]}'```
+
+dev/api/secretsanta/giftIdeas/ryan/avengers
 
 ## Add Exclusion lists for a member
 Provide the ability to set names you don't want to be drawn with.

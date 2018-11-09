@@ -7,6 +7,25 @@ const setupSecretSantagroupID = ({ TableName, secretSantagroupID }) => Promise.a
   }).promise()
   ));
 
+const getGiftIdeasForMember = async ({
+  TableName, memberName, groupID
+}) => {
+  const params = {
+    TableName,
+    Key: {
+      memberName,
+      groupID
+    },
+    ProjectionExpression: 'giftIdeas'
+  };
+
+  try {
+    return (await dbClient.get(params).promise()).Item;
+  } catch (error) {
+    return { error: `AWS - ${error.message}` };
+  }
+};
+
 const addGiftIdeasForMember = ({
   TableName, memberName, groupID, giftIdeas
 }) => {
@@ -102,6 +121,7 @@ const getMySecretSanta = async ({ TableName, memberName, groupID }) => {
 
 module.exports = {
   setupSecretSantagroupID,
+  getGiftIdeasForMember,
   addGiftIdeasForMember,
   addExclusionForMember,
   getMembersFromgroupID,

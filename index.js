@@ -5,14 +5,18 @@ const bodyParser = require('koa-bodyparser');
 const koaBody = require('koa-body');
 const cors = require('@koa/cors');
 const convert = require('koa-convert');
+const jwt = require('./middlewares/jwt');
 
 const {
   setupgroupID,
+  getGiftIdeas,
   addGiftIdeas,
   addExclusions,
   drawNames,
   getSecretSanta
 } = require('./controller/secretSanta');
+
+const { login } = require('./controller/auth');
 
 const app = new Koa();
 
@@ -35,11 +39,13 @@ router.get('/api', (ctx) => {
   ctx.body = JSON.stringify({ message: 'Welcome to secretSanta api' });
 });
 
-router.post('/api/secretsanta/setup/:groupID', setupgroupID);
-router.get('/api/secretsanta/draw/:groupID', drawNames);
-router.get('/api/secretsanta/reveal/:memberName/:groupID', getSecretSanta);
-router.put('/api/secretsanta/giftIdeas/:memberName/:groupID', addGiftIdeas);
-router.put('/api/secretsanta/exclusions/:memberName/:groupID', addExclusions);
+router.post('/api/user/login', login);
+router.post('/api/secretsanta/setup/:groupID', jwt, setupgroupID);
+router.get('/api/secretsanta/draw/:groupID', jwt, drawNames);
+router.get('/api/secretsanta/reveal/:memberName/:groupID', jwt, getSecretSanta);
+router.get('/api/secretsanta/giftIdeas/:memberName/:groupID', jwt, getGiftIdeas);
+router.put('/api/secretsanta/giftIdeas/:memberName/:groupID', jwt, addGiftIdeas);
+router.put('/api/secretsanta/exclusions/:memberName/:groupID', jwt, addExclusions);
 
 app.on('error', (err) => {
   console.log('server error', err);

@@ -3,6 +3,7 @@ service: secret-santa-api
 custom:
   tableName: 'secret-santa-api-${self:provider.stage}'
   whitelist: 'http://localhost:3000,http://secretsanta.mineshdesigns.co.uk,http://secretsanta.mineshdesigns.co.uk.s3-website-eu-west-1.amazonaws.com'
+  jwtSecret: 'sn0wman2018$'
 
 provider:
   name: aws
@@ -26,6 +27,7 @@ provider:
   environment:
     SECRET_SANTA_TABLE: ${self:custom.tableName}
     WHITELIST: ${self:custom.whitelist}
+    JWT_SECRET: ${self:custom.jwtSecret}
 
 functions:
   app:
