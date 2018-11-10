@@ -1,3 +1,4 @@
+const gpc = require('generate-pincode');
 const { isValidgroupID } = require('../validator');
 const { getListOfNames, generateDraw } = require('../utilities/draw');
 const {
@@ -23,7 +24,7 @@ const setupgroupID = async (ctx) => {
   const secretSantagroupID = data.map((person) => ({
     ...person,
     groupID,
-    secretPassphrase: 'aaa',
+    secretPassphrase: gpc(4),
     createdAt: new Date().toISOString(),
     giftIdeas: [],
     exclusions: []
