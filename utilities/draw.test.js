@@ -8,7 +8,7 @@ const secretSantaData = [
   {
     memberName: 'gerrard',
     groupName: 'liverpool',
-    exclusions: ['suarez']
+    exclusions: ['suarez', 'torres']
   },
   {
     memberName: 'torres',
@@ -53,8 +53,4 @@ describe('Draw logic', () => {
       }
     ]);
   });
-
-  // it('does not pick the name from a members exclusion list', () => {
-
-  // });
 });
