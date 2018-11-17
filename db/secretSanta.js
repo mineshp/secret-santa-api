@@ -83,6 +83,7 @@ const getMembersFromgroupID = async ({ TableName, groupID }) => {
 
 const setSecretSantaForMember = ({ TableName, results, groupID }) => Promise.all(
   results.map(({ memberName, secretSanta }) => {
+    const encodedSecretSanta = Buffer.from(secretSanta).toString('base64');
     const params = {
       TableName,
       Key: {
@@ -91,7 +92,7 @@ const setSecretSantaForMember = ({ TableName, results, groupID }) => Promise.all
       },
       UpdateExpression: 'set secretSanta = :santa',
       ExpressionAttributeValues: {
-        ':santa': secretSanta,
+        ':santa': encodedSecretSanta,
       }
     };
 
