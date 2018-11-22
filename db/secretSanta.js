@@ -13,8 +13,8 @@ const getGiftIdeasForMember = async ({
   const params = {
     TableName,
     Key: {
-      memberName,
-      groupID
+      memberName: memberName.toLowerCase(),
+      groupID: groupID.toLowerCase()
     },
     ProjectionExpression: 'giftIdeas'
   };
@@ -32,8 +32,8 @@ const addGiftIdeasForMember = ({
   const params = {
     TableName,
     Key: {
-      memberName,
-      groupID
+      memberName: memberName.toLowerCase(),
+      groupID: groupID.toLowerCase()
     },
     UpdateExpression: 'set giftIdeas = :gi',
     ExpressionAttributeValues: {
@@ -51,8 +51,8 @@ const addExclusionForMember = ({
   const params = {
     TableName,
     Key: {
-      memberName,
-      groupID
+      memberName: memberName.toLowerCase(),
+      groupID: groupID.toLowerCase()
     },
     UpdateExpression: 'set exclusions = :ex',
     ExpressionAttributeValues: {
@@ -87,8 +87,8 @@ const setSecretSantaForMember = ({ TableName, results, groupID }) => Promise.all
     const params = {
       TableName,
       Key: {
-        memberName,
-        groupID
+        memberName: memberName.toLowerCase(),
+        groupID: groupID.toLowerCase()
       },
       UpdateExpression: 'set secretSanta = :santa',
       ExpressionAttributeValues: {
@@ -107,8 +107,8 @@ const getMySecretSanta = async ({ TableName, memberName, groupID }) => {
   const params = {
     TableName,
     Key: {
-      memberName,
-      groupID
+      memberName: memberName.toLowerCase(),
+      groupID: groupID.toLowerCase()
     },
     ProjectionExpression: 'secretSanta'
   };

@@ -1,6 +1,6 @@
 const { dbClient } = require('./dbClient');
 
-const isPassphraseValid = (passphraseInDB, userEnteredPassphrase) => passphraseInDB === userEnteredPassphrase;
+const isCodeValid = (passphraseInDB, userEnteredPassphrase) => passphraseInDB === userEnteredPassphrase;
 
 const validateUser = async ({
   TableName, memberName, groupID, passphrase
@@ -8,17 +8,17 @@ const validateUser = async ({
   const params = {
     TableName,
     Key: {
-      memberName,
-      groupID
+      memberName: memberName.toLowerCase(),
+      groupID: groupID.toLowerCase()
     }
   };
 
   try {
     const user = (await dbClient.get(params).promise()).Item;
     if (user && user.memberName) {
-      return isPassphraseValid(user.secretPassphrase, passphrase)
+      return isCodeValid(user.secretPassphrase, passphrase)
         ? user
-        : { error: 'Invalid passphrase provided' };
+        : { error: 'Invalid code provided' };
     }
     return { error: `User ${memberName} for group ${groupID} not found.` };
   } catch (error) {
