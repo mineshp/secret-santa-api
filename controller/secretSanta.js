@@ -19,7 +19,12 @@ const setupgroupID = async (ctx) => {
 
   const memberNamesInDraw = data.reduce((acc, person) => [...acc, person.memberName], []);
 
-  if (!isValidgroupID(memberNamesInDraw)) ctx.response.status = 404;
+  if (!isValidgroupID(memberNamesInDraw)) {
+    ctx.status = 404;
+    ctx.body = JSON.stringify({
+      error: 'Unable to create a group with less than two members.'
+    });
+  }
 
   const secretSantagroupID = data.map((person) => ({
     ...person,
@@ -35,9 +40,7 @@ const setupgroupID = async (ctx) => {
     secretSantagroupID
   };
 
-  const save = await setupSecretSantagroupID(payload);
-
-  ctx.body = save ? JSON.stringify({ ok: 1 }) : JSON.stringify({ error: 'Failed to save item' });
+  ctx.body = await setupSecretSantagroupID(payload);
 };
 
 const getGiftIdeas = async (ctx) => {
