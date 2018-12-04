@@ -69,6 +69,8 @@ const addGiftIdeas = async (ctx) => {
     giftIdeas
   };
 
+  console.log(payload);
+
   ctx.body = await addGiftIdeasForMember(payload);
 };
 
