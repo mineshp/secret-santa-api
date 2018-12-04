@@ -41,8 +41,6 @@ const addGiftIdeasForMember = ({
     }
   };
 
-  console.log(giftIdeas);
-
   return dbClient.update(params).promise()
     .catch((e) => console.log(e) || JSON.stringify({ error: e }));
 };
