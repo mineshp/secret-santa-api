@@ -12,7 +12,6 @@ const validateUser = async ({
       groupID
     }
   };
-
   try {
     const user = (await dbClient.get(params).promise()).Item;
     if (user && user.memberName) {

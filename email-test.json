@@ -1,0 +1,17 @@
+{
+  "mailConfig": {
+    "from":"mineshdesigns@gmail.com",
+    "replyTo":"mineshdesigns@gmail.com",
+    "subject":"secret santa"
+  },
+  "members": [{
+    "memberName": "minesh",
+    "secretPassphrase": "1111",
+    "email": "mineshpatelis@gmail.com"
+  }, {
+    "memberName": "jignasha",
+    "secretPassphrase": "2222",
+    "email": "mineshpatelis@gmail.com"
+  }],
+  "groupName": "giftwrappers"
+}

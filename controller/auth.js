@@ -6,6 +6,7 @@ const TableName = process.env.SECRET_SANTA_TABLE;
 const login = async (ctx) => {
   const data = ctx.request.body;
   const user = await validateUser({ TableName, ...data });
+
   if (user && user.memberName) {
     const { memberName, groupID, email } = user;
     const res = JSON.stringify({

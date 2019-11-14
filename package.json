@@ -6,6 +6,7 @@
   "scripts": {
     "start:api": "./node_modules/.bin/nodemon server/index.js",
     "test": "jest --watchAll",
+    "send:email": "SLS_DEBUG=* serverless invoke --function send-email --path email-test.json",
     "coverage": "npm run test -- --coverage",
     "coverage:report": "open -a Google\\ Chrome ./coverage/lcov-report/index.html",
     "lint": "eslint --config .eslintrc.js .",

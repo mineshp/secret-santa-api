@@ -42,7 +42,7 @@ const addGiftIdeasForMember = ({
   };
 
   return dbClient.update(params).promise()
-    .catch((e) => console.log(e) || JSON.stringify({ error: e }));
+    .catch((e) => JSON.stringify({ error: e }));
 };
 
 const addExclusionForMember = ({
@@ -61,7 +61,7 @@ const addExclusionForMember = ({
   };
 
   return dbClient.update(params).promise()
-    .catch((e) => console.log(e) || JSON.stringify({ error: e }));
+    .catch((e) => JSON.stringify({ error: e }));
 };
 
 const getMembersFromgroupID = async ({ TableName, groupID }) => {
@@ -120,6 +120,41 @@ const getMySecretSanta = async ({ TableName, memberName, groupID }) => {
   }
 };
 
+const getAllSecretSantaGroups = async ({ TableName }) => {
+  const params = {
+    TableName,
+    ProjectionExpression: 'memberName,groupID'
+  };
+  try {
+    return (await dbClient.scan(params).promise()).Items;
+  } catch (error) {
+    return { error: `AWS - ${error.message}` };
+  }
+};
+
+const removeSecretSantaGroup = async ({ TableName, groupID, secretSantaGroupMembersToDelete }) => {
+  const params = {
+    RequestItems: {}
+  };
+
+  const Keys = secretSantaGroupMembersToDelete.map(({ memberName }) => ({
+    DeleteRequest: {
+      Key: {
+        memberName,
+        groupID
+      }
+    }
+  }));
+
+  params.RequestItems[TableName] = Keys;
+
+  try {
+    return (await dbClient.batchWrite(params).promise());
+  } catch (error) {
+    return { error: `AWS - ${error.message}` };
+  }
+};
+
 module.exports = {
   setupSecretSantagroupID,
   getGiftIdeasForMember,
@@ -127,5 +162,7 @@ module.exports = {
   addExclusionForMember,
   getMembersFromgroupID,
   setSecretSantaForMember,
-  getMySecretSanta
+  getMySecretSanta,
+  getAllSecretSantaGroups,
+  removeSecretSantaGroup
 };

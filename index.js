@@ -13,7 +13,10 @@ const {
   addGiftIdeas,
   addExclusions,
   drawNames,
-  getSecretSanta
+  getSecretSanta,
+  getAllGroups,
+  removeGroup,
+  sendEmailToMembers
 } = require('./controller/secretSanta');
 
 const { login } = require('./controller/auth');
@@ -32,7 +35,7 @@ const checkOriginAgainstWhitelist = (ctx) => {
 
 app.use(convert(cors({ origin: checkOriginAgainstWhitelist })));
 app.use(koaBody());
-app.use(bodyParser());
+app.use(bodyParser({ enableTypes: ['json'] }));
 
 const router = new Router();
 router.get('/api', (ctx) => {
@@ -42,10 +45,13 @@ router.get('/api', (ctx) => {
 router.post('/api/user/login', login);
 router.post('/api/secretsanta/setup/:groupID', jwt, setupgroupID);
 router.get('/api/secretsanta/draw/:groupID', jwt, drawNames);
+router.get('/api/secretsanta/admin/allgroups', jwt, getAllGroups);
+router.get('/api/secretsanta/admin/sendEmail/:groupID', jwt, sendEmailToMembers);
 router.get('/api/secretsanta/reveal/:memberName/:groupID', jwt, getSecretSanta);
 router.get('/api/secretsanta/giftIdeas/:memberName/:groupID', jwt, getGiftIdeas);
 router.put('/api/secretsanta/giftIdeas/:memberName/:groupID', jwt, addGiftIdeas);
 router.put('/api/secretsanta/exclusions/:memberName/:groupID', jwt, addExclusions);
+router.delete('/api/secretsanta/:groupID', jwt, removeGroup);
 
 app.on('error', (err) => {
   console.log('server error', err);

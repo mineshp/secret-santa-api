@@ -4,6 +4,8 @@ custom:
   tableName: 'secret-santa-api-${self:provider.stage}'
   whitelist: 'http://localhost:3000,http://secretsanta.mineshdesigns.co.uk,http://secretsanta.mineshdesigns.co.uk.s3-website-eu-west-1.amazonaws.com'
   jwtSecret: 'sn0wman2018$'
+  senderEmail: 'mineshdesigns@gmail.com'
+  sendEmailFunction: 'secret-santa-api-dev-send-email'
 
 provider:
   name: aws
@@ -19,15 +21,33 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
+        - dynamodb:BatchWriteItem
       Resource:
         - { "Fn::GetAtt": ["DynamoDBTable", "Arn" ] }
         - { "Fn::Join": [ "/", [
             { "Fn::GetAtt": ["DynamoDBTable", "Arn" ] }, "index", "groupID-index"
           ] ] }
+    - Effect: Allow
+      Action:
+        - lambda:InvokeFunction
+        - lambda:InvokeAsync
+      Resource:
+        "arn:aws:lambda:eu-west-1:805665609698:function:secret-santa-api-dev-send-email"
+    - Effect: Allow
+      Action:
+        - ses:SendEmail
+      Resource:
+        - "*"
+      Condition:
+        StringEquals:
+          ses:FromAddress:
+            - "mineshdesigns@gmail.com"
   environment:
     SECRET_SANTA_TABLE: ${self:custom.tableName}
     WHITELIST: ${self:custom.whitelist}
     JWT_SECRET: ${self:custom.jwtSecret}
+    SENDER_EMAIL: ${self:custom.senderEmail}
+    SEND_EMAIL_FUNCTION: ${self:custom.sendEmailFunction}
 
 functions:
   app:
@@ -35,6 +55,8 @@ functions:
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
+  send-email:
+    handler: email.handler
 
 resources:
   Resources:
