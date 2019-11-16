@@ -57,6 +57,10 @@ functions:
       - http: 'ANY {proxy+}'
   send-email:
     handler: email.handler
+  alexa-secret-santa-skill:
+    handler: skill.handler
+    events:
+      - alexaSkill: amzn1.ask.skill.a8154279-590e-4678-907b-bce68e79edb5
 
 resources:
   Resources:
