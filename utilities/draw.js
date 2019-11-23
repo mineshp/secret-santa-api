@@ -18,8 +18,6 @@ const pickAName = (memberName, namesList, exclusions) => {
     : getRandomName(filteredList);
 };
 
-// let retry = false;
-
 const generateDraw = (namesInHat, listRemaining, secretSantaGroupMembersInfo, retry = 0) => {
   if (retry > 10) { throw new Error('Draw not possible'); }
   const result = namesInHat.reduce((acc, memberName) => {

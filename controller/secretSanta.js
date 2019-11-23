@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const gpc = require('generate-pincode');
+const getCode = require('../utilities/getCode');
 const { isValidgroupID } = require('../validator');
 const { getListOfNames, generateDraw } = require('../utilities/draw');
 const {
@@ -29,10 +29,13 @@ const setupgroupID = async (ctx) => {
     return;
   }
 
+  const code = getCode[Math.floor(Math.random() * getCode.length)];
+  getCode.splice(code, 1);
+
   const secretSantagroupID = data.map((person) => ({
     ...person,
     groupID,
-    secretPassphrase: gpc(4),
+    secretPassphrase: code,
     createdAt: new Date().toISOString(),
     giftIdeas: [],
     exclusions: []
