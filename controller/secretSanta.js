@@ -29,17 +29,21 @@ const setupgroupID = async (ctx) => {
     return;
   }
 
-  const code = getCode[Math.floor(Math.random() * getCode.length)];
-  getCode.splice(code, 1);
+  const list = getCode;
 
-  const secretSantagroupID = data.map((person) => ({
-    ...person,
-    groupID,
-    secretPassphrase: code,
-    createdAt: new Date().toISOString(),
-    giftIdeas: [],
-    exclusions: []
-  }));
+  const secretSantagroupID = data.map((person) => {
+    const randNum = Math.floor(Math.random() * list.length);
+    const code = list[randNum];
+    list.splice(randNum, 1);
+    return {
+      ...person,
+      groupID,
+      secretPassphrase: code,
+      createdAt: new Date().toISOString(),
+      giftIdeas: [],
+      exclusions: []
+    };
+  });
 
   const payload = {
     TableName,
