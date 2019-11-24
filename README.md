@@ -10,22 +10,35 @@
 
 ```sls logs -f app```
 
-### Invoke lambda locally
+### Invoke lambda locally for secret santa api
 
 ```sls invoke local --function app```
 
+### Invoke lambda locally for secret santa send email
+
+```sls invoke local --function send-email```
+
+### Send email to test
+
+```bash
+  SECRET_SANTA_TABLE=secret-santa-api-dev AWS_PROFILE=min-aws npm run send:email
+```
+
 ## Get my secret santa
+
 Returns your secretSanta
 
 ```curl -H "Content-Type: application/json" -X GET ${BASE_URL}/api/secretsanta/reveal/inigo/avengers```
 
 ## Setup Secret Santa Group with members
+
 Requires an array of objects, with a memberName and email.
 
 ```curl -H "Content-Type: application/json" -X POST ${BASE_URL}api/secretsanta/setup/avengers -d '[{"memberName":"inigo", "email":"test@email.com"},{"memberName":"ryan", "email":"test@2email.com"}]'```
 
 Data
-```
+
+```json
 [{"memberName":"name1","email":"emailAddress"},{"memberName":"name2","email":"emailAddress"}]
 ```
 
@@ -38,7 +51,8 @@ Get gift ideas for a member
 Add gift ideas, so your secret santa has some ideas of what you might prefer to get.
 
 Data
-```
+
+```json
 {"giftIdeas":["socks","candles","toys"]}
 ```
 
@@ -50,7 +64,8 @@ dev/api/secretsanta/giftIdeas/ryan/avengers
 Provide the ability to set names you don't want to be drawn with.
 
 Data
-```
+
+```json
 {"exclusions":["name1","name2"]}
 ```
 

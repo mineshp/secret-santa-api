@@ -52,8 +52,8 @@ img.fullwidth { max-width: 100%!important; }      img.fullwidthOnMobile { max-wi
                 <div style="background-color: transparent; width: 100% !important;">
                   <div style="border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent; padding-top:5px; padding-bottom:15px; padding-right: 0px; padding-left: 0px;">
                     <div class="">
-                      <div style="color:#00d2b9;font-family:Georgia, Times, 'Times New Roman', serif;line-height:120%; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">
-                        <div style="font-size:12px;line-height:14px;font-family:Georgia, Times, 'Times New Roman', serif;color:#00d2b9;text-align:left;">
+                      <div style="color:#b15082;font-family:Georgia, Times, 'Times New Roman', serif;line-height:120%; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">
+                        <div style="font-size:12px;line-height:14px;font-family:Georgia, Times, 'Times New Roman', serif;color:#b15082;text-align:left;">
                           <p style="margin: 0;font-size: 14px;line-height: 17px;text-align: center">
                             <span style="font-size: 38px; line-height: 45px;">
                               <span style="line-height: 45px; font-size: 38px;">Hi</span>
@@ -63,7 +63,7 @@ img.fullwidth { max-width: 100%!important; }      img.fullwidthOnMobile { max-wi
                             <em>
                               <span style="color: rgb(85, 85, 85); font-size: 80px; line-height: 96px;">
                                 <span style="line-height: 96px; font-size: 80px;">
-                                  <span style="line-height: 96px; font-size: 80px;">${memberName}!</span>
+                                  <span style="line-height: 96px; font-size: 80px; text-transform: capitalize;">${memberName}!</span>
                                 </span>
                               </span>
                             </em>
@@ -86,8 +86,8 @@ img.fullwidth { max-width: 100%!important; }      img.fullwidthOnMobile { max-wi
                       </div>
                     </div>
                     <div class="">
-                      <div style="color:#00d2b9;font-family:Georgia, Times, 'Times New Roman', serif;line-height:120%; padding-right: 0px; padding-left: 0px; padding-top: 0px; padding-bottom: 5px;">
-                        <div style="font-size:12px;line-height:14px;font-family:Georgia, Times, 'Times New Roman', serif;color:#00d2b9;text-align:left;">
+                      <div style="color:#b15082;font-family:Georgia, Times, 'Times New Roman', serif;line-height:120%; padding-right: 0px; padding-left: 0px; padding-top: 0px; padding-bottom: 5px;">
+                        <div style="font-size:12px;line-height:14px;font-family:Georgia, Times, 'Times New Roman', serif;color:#b15082;text-align:left;">
                           <p style="margin: 0;font-size: 12px;line-height: 14px;text-align: center">
                             <span style="font-size: 22px; line-height: 26px;">
                               <span style="line-height: 26px; font-size: 22px;">...see what they have added to their Wishlist!</span>
@@ -104,8 +104,8 @@ img.fullwidth { max-width: 100%!important; }      img.fullwidthOnMobile { max-wi
                       </div>
                     </div>
                     <div class="">
-                      <div style="color:#00d2b9;font-family:Georgia, Times, 'Times New Roman', serif;line-height:120%; padding-right: 0px; padding-left: 0px; padding-top: 0px; padding-bottom: 5px;">
-                        <div style="font-size:12px;line-height:14px;font-family:Georgia, Times, 'Times New Roman', serif;color:#00d2b9;text-align:left;">
+                      <div style="color:#b15082;font-family:Georgia, Times, 'Times New Roman', serif;line-height:120%; padding-right: 0px; padding-left: 0px; padding-top: 0px; padding-bottom: 5px;">
+                        <div style="font-size:12px;line-height:14px;font-family:Georgia, Times, 'Times New Roman', serif;color:#b15082;text-align:left;">
                           <p style="margin: 0;font-size: 12px;line-height: 14px;text-align: center">
                             <span style="font-size: 22px; line-height: 26px;">
                               <span style="line-height: 26px; font-size: 22px;">Alexa integration is here</span>
@@ -124,7 +124,7 @@ img.fullwidth { max-width: 100%!important; }      img.fullwidthOnMobile { max-wi
                     <div class="">
                       <div style="color:#989898;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:120%; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">
                         <div style="font-size:12px;line-height:14px;color:#989898;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align:left;">
-                          <ul style="color:#00d2b9; margin: 0;font-size: 16px;line-height: 17px;" type="square">
+                          <ul style="color:#b15082; margin: 0;font-size: 16px;line-height: 17px;" type="square">
                               <li>Alexa who is my secret santa?</li>
                               <li>Alexa what have i added to my wishlist?</li>
                               <li>Alexa add to my wishlist?</li>
@@ -254,7 +254,7 @@ img.fullwidth { max-width: 100%!important; }      img.fullwidthOnMobile { max-wi
                 <div style="background-color: transparent; width: 100% !important;">
                   <div style="border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
                     <div align="center" class="button-container center " style="padding-right: 10px; padding-left: 10px; padding-top:10px; padding-bottom:10px;">
-                      <a href="http://secretsanta.mineshdesigns.co.uk" target="_blank" style="display: block;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #00d2b9; border-radius: 0px; -webkit-border-radius: 0px; -moz-border-radius: 0px; max-width: 218px; width: 178px;width: auto; border-top: 0px solid #A5CEA3; border-right: 0px solid #A5CEA3; border-bottom: 0px solid #A5CEA3; border-left: 0px solid #A5CEA3; padding-top: 5px; padding-right: 20px; padding-bottom: 5px; padding-left: 20px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;mso-border-alt: none">
+                      <a href="http://secretsanta.mineshdesigns.co.uk" target="_blank" style="display: block;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #b15082; border-radius: 0px; -webkit-border-radius: 0px; -moz-border-radius: 0px; max-width: 218px; width: 178px;width: auto; border-top: 0px solid #A5CEA3; border-right: 0px solid #A5CEA3; border-bottom: 0px solid #A5CEA3; border-left: 0px solid #A5CEA3; padding-top: 5px; padding-right: 20px; padding-bottom: 5px; padding-left: 20px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;mso-border-alt: none">
                         <span style="font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;font-size:16px;line-height:32px;">OPEN SECRET SANTA</span>
                       </a>
                     </div>
@@ -264,7 +264,7 @@ img.fullwidth { max-width: 100%!important; }      img.fullwidthOnMobile { max-wi
             </div>
           </div>
         </div>
-        <div style="background-color:#00d2b9;">
+        <div style="background-color:#b15082;">
           <div style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;" class="block-grid ">
             <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
               <div class="col num12" style="min-width: 320px;max-width: 500px;display: table-cell;vertical-align: top;">

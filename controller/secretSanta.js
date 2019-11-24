@@ -147,11 +147,13 @@ const sendEmailToMembers = async (ctx) => {
     email
   }));
 
+  const subject = `Secret Santa 2019 group ${groupID.charAt(0).toUpperCase() + groupID.slice(1)}  - The wait is over!`;
+
   const emailParams = {
     mailConfig: {
       from: process.env.SENDER_EMAIL,
       replyTo: process.env.SENDER_EMAIL,
-      subject: `Secret Santa 2019 ${groupID} - The wait is over!`
+      subject
     },
     groupName: groupID,
     members
