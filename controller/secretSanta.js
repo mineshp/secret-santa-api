@@ -69,7 +69,6 @@ const getGiftIdeas = async (ctx) => {
 const addGiftIdeas = async (ctx) => {
   const { memberName, groupID } = ctx.params;
   const { giftIdeas } = ctx.request.body;
-
   if (giftIdeas.length < 1) ctx.response.status = 404;
 
   const payload = {
@@ -78,7 +77,6 @@ const addGiftIdeas = async (ctx) => {
     groupID,
     giftIdeas
   };
-
   ctx.body = await addGiftIdeasForMember(payload);
 };
 

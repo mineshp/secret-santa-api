@@ -125,10 +125,10 @@ img.fullwidth { max-width: 100%!important; }      img.fullwidthOnMobile { max-wi
                       <div style="color:#989898;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:120%; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">
                         <div style="font-size:12px;line-height:14px;color:#989898;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align:left;">
                           <ul style="color:#b15082; margin: 0;font-size: 16px;line-height: 17px;" type="square">
-                              <li>Alexa who is my secret santa?</li>
-                              <li>Alexa what have i added to my wishlist?</li>
-                              <li>Alexa add to my wishlist?</li>
-                              <li>Alexa what has my secret santa added to their wishlist?</li>
+                              <li>Alexa ask secret santa to reveal santa's secret</li>
+                              <li>Alexa ask secret santa what’s on my Wishlist</li>
+                              <li>Alexa ask secret santa what has my giftee wished for this christmas?</li>
+                              <li>Alexa ask secret santa for santa's help</li>
                           </ul>
                         </div>
                       </div>

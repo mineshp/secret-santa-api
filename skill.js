@@ -1,4 +1,4 @@
-const { alexaGetMySecretSanta, getMembersFromgroupID } = require('./db/secretSanta');
+const { getMembersFromgroupID } = require('./db/secretSanta');
 
 const TableName = process.env.SECRET_SANTA_TABLE;
 
@@ -15,35 +15,12 @@ const generateResponse = (speechletResponse) => ({
   response: speechletResponse
 });
 
-const validateUsers = async (memberName, groupName, passphrase) => {
-  const response = await alexaGetMySecretSanta({
-    TableName,
-    memberName,
-    groupID: groupName
-  })
-    .catch(() => ({ error: 'Name or group is incorrect, please verify details and try again!' }));
-  console.log('in validateUsers called alexaGetMySecretSanta');
-  console.log(memberName);
-  console.log(groupName);
-  console.log(response);
-  if (!response) {
-    return { error: 'we are unable to find your details, please check you have provided the correct information from the secret santa email.' };
-  }
-  if (passphrase && response && response.secretPassphrase === passphrase) {
-    return Buffer.from(response.secretSanta, 'base64').toString('ascii');
-  }
-  if (passphrase && response && response.secretPassphrase !== passphrase) {
-    return { error: 'Passphrase is incorrect, please check email with details.' };
-  }
-};
-
-const findUser = async (groupName, passphrase) => {
+const revealGifteesName = async (groupName, passphrase) => {
   const allMembers = await getMembersFromgroupID({ TableName, groupID: groupName });
-  console.log(allMembers);
   const memberFound = allMembers.find((member) => member.secretPassphrase === passphrase);
-  console.log(memberFound);
+
   if (!memberFound) {
-    return { error: 'we are unable to find your details, please check you have provided the correct information from the secret santa email.' };
+    return { error: 'I am unable to find your details, please check you have provided the correct information from the secret santa email.' };
   }
   if (passphrase && memberFound) {
     return Buffer.from(memberFound.secretSanta, 'base64').toString('ascii');
@@ -51,15 +28,52 @@ const findUser = async (groupName, passphrase) => {
   if (passphrase && memberFound && memberFound.secretPassphrase !== passphrase) {
     return { error: 'Passphrase is incorrect, please check email with details.' };
   }
+  return undefined;
 };
 
-const secretSantaSkill = (event, context, callback) => {
+const retrieveMemberByPassphrase = async (groupName, passphrase) => {
+  const allMembers = await getMembersFromgroupID({ TableName, groupID: groupName });
+  const memberFound = allMembers.find((member) => member.secretPassphrase === passphrase);
+
+  if (!memberFound) {
+    return { error: 'I am unable to find your details, please check you have provided the correct information from the secret santa email.' };
+  }
+  if (passphrase && memberFound) {
+    return memberFound;
+  }
+  if (passphrase && memberFound && memberFound.secretPassphrase !== passphrase) {
+    return { error: 'Passphrase is incorrect, please check email with details.' };
+  }
+  return undefined;
+};
+
+const retrieveGifteesWishlist = async (groupName, memberName) => {
+  const allMembers = await getMembersFromgroupID({ TableName, groupID: groupName });
+  const memberFound = allMembers.find((member) => member.memberName === memberName);
+
+  if (!memberFound) {
+    return { error: 'I am unable to find details of your secret santa, please start again.' };
+  }
+  return memberFound.giftIdeas;
+};
+
+const secretSantaSkill = (event, context) => {
   switch (event.request.type) {
     case 'LaunchRequest':
       context.succeed(generateResponse(buildSpeechResponse('It\'s beginning to look a lot like Christmas', false)));
       break;
     case 'IntentRequest':
       switch (event.request.intent.name) {
+        case 'AMAZON.StopIntent': {
+          const stopMessage = 'Don\'t stop believing!';
+          context.succeed(generateResponse(buildSpeechResponse(stopMessage, true)));
+          break;
+        }
+        case 'AMAZON.HelpIntent': {
+          const helpMessage = 'You can ask me the following, Ask secret santa to reveal santas secret? Ask secret santa what’s on my Wishlist? Ask secret santa what has my giftee wished for this christmas?';
+          context.succeed(generateResponse(buildSpeechResponse(helpMessage, true)));
+          break;
+        }
         case 'RevealSecretSanta': {
           const memberName = event.request.intent.slots.memberName.value.toLowerCase();
           const passphrase = event.request.intent.slots.passphrase.value;
@@ -69,32 +83,97 @@ const secretSantaSkill = (event, context, callback) => {
             const aloneConfirmation = event.request.intent.slots.aloneConfirmation.value.toUpperCase();
 
             if (aloneConfirmation === 'YES') {
-              findUser(groupName, passphrase)
+              revealGifteesName(groupName, passphrase)
                 .then((response) => {
-                  console.log(response);
                   if (response.error) {
-                    const errorMessage = `Ok ${memberName}, ${response.error}`;
+                    const errorMessage = `Ok ${memberName} ${response.error}`;
                     context.succeed(generateResponse(buildSpeechResponse(errorMessage, true)));
                   } else {
-                    const finalMessage = `Ok ${memberName}, your secret santa is ${response}, Happy shopping!`;
+                    const finalMessage = `Ok ${memberName} your secret santa is ${response}, Happy shopping!`;
                     context.succeed(generateResponse(buildSpeechResponse(finalMessage, true)));
                   }
                 });
             } else if (aloneConfirmation === 'NO') {
-              const notAloneMessage = `Ok ${memberName}, try again when you are alone!`;
+              const notAloneMessage = `Ok ${memberName} try again when you are alone!`;
               context.succeed(generateResponse(buildSpeechResponse(notAloneMessage, true)));
             }
           } else {
-            const errorMessage = 'Looks like we didnt quite get all the information, please start again!';
+            const errorMessage = 'Looks like I didnt quite get all the information, please start again!';
+            context.succeed(generateResponse(buildSpeechResponse(errorMessage, true)));
+          }
+          break;
+        }
+        case 'ManageMyWishlist': {
+          const passphrase = event.request.intent.slots.passphrase.value.toLowerCase();
+          const groupName = event.request.intent.slots.groupName.value.toLowerCase();
+
+          if (groupName && passphrase) {
+            retrieveMemberByPassphrase(groupName, passphrase)
+              .then((response) => {
+                if (response.error) {
+                  const errorMessage = `I've gone to build a snowman, ${response.error}`;
+                  context.succeed(generateResponse(buildSpeechResponse(errorMessage, true)));
+                } else if (response.giftIdeas.length > 0) {
+                  const gifts = response.giftIdeas.join();
+                  const finalMessage = `Ok ${response.memberName} you have added the following gift ideas, ${gifts}`;
+                  context.succeed(generateResponse(buildSpeechResponse(finalMessage, true)));
+                } else {
+                  const finalMessage = 'Looks like your list is empty, ask me to add to your wishlist!';
+                  context.succeed(generateResponse(buildSpeechResponse(finalMessage, true)));
+                  // See if alexa can ask another question here?
+                }
+              });
+          } else {
+            const errorMessage = 'Looks like I didnt quite get all the information, please start again!';
+            context.succeed(generateResponse(buildSpeechResponse(errorMessage, true)));
+          }
+          break;
+        }
+        case 'RevealGifteesWishlist': {
+          const passphrase = event.request.intent.slots.passphrase.value.toLowerCase();
+          const groupName = event.request.intent.slots.groupName.value.toLowerCase();
+
+          if (groupName && passphrase) {
+            retrieveMemberByPassphrase(groupName, passphrase)
+              .then((response) => {
+                if (response.error) {
+                  const errorMessage = `I've gone to feed the reindeers, ${response.error}`;
+                  context.succeed(generateResponse(buildSpeechResponse(errorMessage, true)));
+                } else if (response.secretSanta) {
+                  const secretName = Buffer.from(response.secretSanta, 'base64').toString('ascii');
+                  retrieveGifteesWishlist(groupName, secretName)
+                    .then((giftIdeas) => {
+                      if (giftIdeas.error) {
+                        const errorMessage = `I've gone to feed the reindeers, ${giftIdeas.error}`;
+                        context.succeed(generateResponse(buildSpeechResponse(errorMessage, true)));
+                      } else if (giftIdeas.length > 0) {
+                        const gifts = giftIdeas.join();
+                        const myGifteesWishlistMessage = `Hi ${response.memberName} your giftee has wished for ${gifts}, Happy Shopping!`;
+                        context.succeed(generateResponse(buildSpeechResponse(myGifteesWishlistMessage, true)));
+                      } else {
+                        const myGifteesEmptyWishlistMessage = `Hi ${response.memberName} your giftee has no wishes, please try again later.`;
+                        context.succeed(generateResponse(buildSpeechResponse(myGifteesEmptyWishlistMessage, true)));
+                      }
+                    });
+                } else {
+                  const finalMessage = 'Oh oh! I didn\'t find what you are looking for';
+                  context.succeed(generateResponse(buildSpeechResponse(finalMessage, true)));
+                }
+              });
+          } else {
+            const errorMessage = 'Looks like I didnt quite get all the information, sorry my hearings not great, please start again!';
             context.succeed(generateResponse(buildSpeechResponse(errorMessage, true)));
           }
           break;
         }
         default:
+          context.succeed(generateResponse(buildSpeechResponse('Looks like something got lost in translation!', true)));
           break;
       }
+      context.succeed(generateResponse(buildSpeechResponse('Looks like something got lost in translation!', true)));
       break;
     default:
+      context.succeed(generateResponse(buildSpeechResponse('Looks like something got lost in translation!', true)));
       break;
   }
 };
