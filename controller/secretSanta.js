@@ -41,7 +41,8 @@ const setupgroupID = async (ctx) => {
       secretPassphrase: code,
       createdAt: new Date().toISOString(),
       giftIdeas: [],
-      exclusions: []
+      exclusions: [],
+      admin: false
     };
   });
 

@@ -8,12 +8,15 @@ const login = async (ctx) => {
   const user = await validateUser({ TableName, ...data });
 
   if (user && user.memberName) {
-    const { memberName, groupID, email } = user;
+    const {
+      memberName, groupID, email, admin
+    } = user;
     const res = JSON.stringify({
       token: jwt.sign({
         memberName,
         groupID,
-        email
+        email,
+        admin: admin || false
       }, process.env.JWT_SECRET),
       message: 'Successfully logged in!'
     });
