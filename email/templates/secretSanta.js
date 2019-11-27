@@ -99,7 +99,7 @@ img.fullwidth { max-width: 100%!important; }      img.fullwidthOnMobile { max-wi
                     <div class="">
                       <div style="color:#989898;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:120%; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">
                         <div style="font-size:12px;line-height:14px;color:#989898;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align:left;">
-                          <p style="margin: 0;font-size: 14px;line-height: 17px;text-align: center">MineshDesigns is proud to present the ${drawYear} Secret Santa Draw for the '${groupName}'. Open the link below and login using the following details to find out who your secret santa is, what they have added to there wishlist in case you are stuck for gift ideas.</p>
+                          <p style="margin: 0;font-size: 14px;line-height: 17px;text-align: center">MineshDesigns is proud to present the ${drawYear} Secret Santa Draw for the '${groupName}'. Open the link below and login using the following details to find out who your giftee is and what they have added to their wishlist, if you need gift ideas.</p>
                         </div>
                       </div>
                     </div>
