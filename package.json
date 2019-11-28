@@ -4,6 +4,7 @@
   "description": "Secret Santa app to draw memberNames for determining who your secret santa is.",
   "main": "index.js",
   "scripts": {
+    "deploy": "AWS_PROFILE=min-aws sls deploy",
     "start:api": "./node_modules/.bin/nodemon server/index.js",
     "test": "jest --watchAll",
     "send:email": "SLS_DEBUG=* serverless invoke --function send-email --path email-test.json",
