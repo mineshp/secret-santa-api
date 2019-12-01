@@ -11,7 +11,8 @@ const {
   setSecretSantaForMember,
   getMySecretSanta,
   getAllSecretSantaGroups,
-  removeSecretSantaGroup
+  removeSecretSantaGroup,
+  getMember
 } = require('../db/secretSanta');
 
 const TableName = process.env.SECRET_SANTA_TABLE;
@@ -171,6 +172,42 @@ const sendEmailToMembers = async (ctx) => {
   ctx.body = response.Payload;
 };
 
+const sendEmailToMember = async (ctx) => {
+  const { groupID, memberName } = ctx.params;
+
+  const members = new Array(await getMember({ TableName, memberName, groupID }));
+
+  const subject = `Secret Santa 2019 group ${groupID.charAt(0).toUpperCase() + groupID.slice(1)}  - The wait is over!`;
+
+  const emailParams = {
+    mailConfig: {
+      from: process.env.SENDER_EMAIL,
+      replyTo: process.env.SENDER_EMAIL,
+      subject
+    },
+    groupName: groupID,
+    members
+  };
+
+  const lambda = new AWS.Lambda({
+    region: 'eu-west-1'
+  });
+
+  const response = await lambda.invoke({
+    FunctionName: process.env.SEND_EMAIL_FUNCTION,
+    Payload: JSON.stringify(emailParams, null, 2) // pass params
+  }).promise()
+    .catch((err) => console.error(err));
+
+  ctx.body = response.Payload;
+};
+
+const getMembersFromGroup = async(ctx) +> {
+  const { groupID } = ctx.params;
+
+  ctx.body = await getMembersFromgroupID({ TableName, groupID });
+}
+
 
 module.exports = {
   setupgroupID,
@@ -181,5 +218,7 @@ module.exports = {
   getGiftIdeas,
   getAllGroups,
   removeGroup,
-  sendEmailToMembers
+  sendEmailToMembers,
+  sendEmailToMember,
+  getMembersFromGroup
 };

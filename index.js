@@ -16,7 +16,9 @@ const {
   getSecretSanta,
   getAllGroups,
   removeGroup,
-  sendEmailToMembers
+  sendEmailToMembers,
+  sendEmailToMember,
+  getMembersFromGroup
 } = require('./controller/secretSanta');
 
 const { login } = require('./controller/auth');
@@ -47,10 +49,12 @@ router.post('/api/secretsanta/setup/:groupID', jwt, setupgroupID);
 router.get('/api/secretsanta/draw/:groupID', jwt, drawNames);
 router.get('/api/secretsanta/admin/allgroups', jwt, getAllGroups);
 router.get('/api/secretsanta/admin/sendEmail/:groupID', jwt, sendEmailToMembers);
+router.get('/api/secretsanta/admin/sendEmail/:groupID/:memberName', jwt, sendEmailToMember);
 router.get('/api/secretsanta/reveal/:memberName/:groupID', jwt, getSecretSanta);
 router.get('/api/secretsanta/giftIdeas/:memberName/:groupID', jwt, getGiftIdeas);
 router.put('/api/secretsanta/giftIdeas/:memberName/:groupID', jwt, addGiftIdeas);
 router.put('/api/secretsanta/exclusions/:memberName/:groupID', jwt, addExclusions);
+router.get('/api/secretsanta/:groupID', jwt, getMembersFromGroup);
 router.delete('/api/secretsanta/:groupID', jwt, removeGroup);
 
 app.on('error', (err) => {

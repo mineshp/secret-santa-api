@@ -120,6 +120,23 @@ const getMySecretSanta = async ({ TableName, memberName, groupID }) => {
   }
 };
 
+const getMember = async ({ TableName, memberName, groupID }) => {
+  const params = {
+    TableName,
+    Key: {
+      memberName,
+      groupID
+    },
+    ProjectionExpression: 'memberName,secretPassphrase,email'
+  };
+
+  try {
+    return (await dbClient.get(params).promise()).Item;
+  } catch (error) {
+    return { error: `AWS - ${error.message}` };
+  }
+};
+
 const getAllSecretSantaGroups = async ({ TableName }) => {
   const params = {
     TableName,
@@ -164,5 +181,6 @@ module.exports = {
   setSecretSantaForMember,
   getMySecretSanta,
   getAllSecretSantaGroups,
-  removeSecretSantaGroup
+  removeSecretSantaGroup,
+  getMember
 };

@@ -2,16 +2,12 @@
   "mailConfig": {
     "from":"mineshdesigns@gmail.com",
     "replyTo":"mineshdesigns@gmail.com",
-    "subject":"secret santa"
+    "subject":"Secret Santa 2019 group Reindeers  - The wait is over!"
   },
   "members": [{
-    "memberName": "minesh",
-    "secretPassphrase": "1111",
-    "email": "mineshpatelis@gmail.com"
-  }, {
-    "memberName": "jignasha",
-    "secretPassphrase": "2222",
-    "email": "mineshpatelis@gmail.com"
+    "memberName": "arvind",
+    "secretPassphrase": "reindeer",
+    "email": "arvindmp@msn.com"
   }],
-  "groupName": "giftwrappers"
+  "groupName": "reindeers"
 }
