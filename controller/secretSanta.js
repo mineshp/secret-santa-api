@@ -202,11 +202,20 @@ const sendEmailToMember = async (ctx) => {
   ctx.body = response.Payload;
 };
 
-const getMembersFromGroup = async(ctx) +> {
+const getMembersFromGroup = async (ctx) => {
   const { groupID } = ctx.params;
 
-  ctx.body = await getMembersFromgroupID({ TableName, groupID });
-}
+  const members = await getMembersFromgroupID({ TableName, groupID });
+
+  ctx.body = members.map(({
+    memberName, email, secretSanta, admin
+  }) => ({
+    memberName,
+    email,
+    drawn: !!secretSanta,
+    admin
+  }));
+};
 
 
 module.exports = {
