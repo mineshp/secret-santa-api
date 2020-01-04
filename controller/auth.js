@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { validateUser } = require('../db/auth');
+const { validateUser, setLoggedInTimestamp } = require('../db/auth');
 
 const TableName = process.env.SECRET_SANTA_TABLE;
 
@@ -8,6 +8,7 @@ const login = async (ctx) => {
   const user = await validateUser({ TableName, ...data });
 
   if (user && user.memberName) {
+    await setLoggedInTimestamp({ TableName, ...data });
     const {
       memberName, groupID, email, admin
     } = user;

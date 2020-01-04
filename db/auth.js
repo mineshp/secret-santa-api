@@ -25,6 +25,25 @@ const validateUser = async ({
   }
 };
 
+const setLoggedInTimestamp = async ({
+  TableName, memberName, groupID,
+}) => {
+  const params = {
+    TableName,
+    Key: {
+      memberName,
+      groupID
+    },
+    UpdateExpression: 'set lastLoggedIn = :loggedIn',
+    ExpressionAttributeValues: {
+      ':loggedIn': new Date().toISOString()
+    }
+  };
+
+  return dbClient.update(params).promise()
+    .catch((e) => JSON.stringify({ error: e }));
+};
+
 module.exports = {
-  validateUser
+  validateUser, setLoggedInTimestamp
 };
