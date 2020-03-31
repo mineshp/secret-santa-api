@@ -97,8 +97,8 @@ const setSecretSantaForMember = ({ TableName, results, groupID }) => Promise.all
     };
 
     return dbClient.update(params).promise()
-      .then((data) => JSON.stringify(data))
-      .catch((error) => JSON.stringify({ error }));
+      .then((data) => console.log(data) || JSON.stringify(data))
+      .catch((error) => console.log() || JSON.stringify({ error }));
   })
 );
 

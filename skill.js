@@ -18,13 +18,13 @@ const generateResponse = (speechletResponse) => ({
 const readList = (list) => [list.slice(0, -1).join(', '), list.slice(-1)[0]].join(list.length < 2 ? '' : ' and ');
 
 const revealGifteesName = async (memberName, groupName, passphrase) => {
-  const allMembers = await getMembersFromgroupID({ TableName, groupID: groupName });
+  const allMembers = await getMembersFromgroupID({ TableName, groupID: groupName.toLowerCase() });
   const memberFound = allMembers.find((member) => member.secretPassphrase === passphrase);
 
   if (!memberFound) {
     return { error: 'I am unable to find your details, please ensure you have an account setup for santa\'s secret,  to do this go to secretsanta.mineshdesigns.co.uk/enrol. If you have an account already, check you have provided the correct information from the santa\'s secret email.' };
   }
-  if (memberFound.memberName !== memberName) {
+  if (memberFound.memberName !== memberName.toLowerCase()) {
     return { error: 'the name provided is incorrect, please check your email for details.' };
   }
   if (passphrase && memberFound && memberFound.secretPassphrase !== passphrase) {
@@ -37,13 +37,13 @@ const revealGifteesName = async (memberName, groupName, passphrase) => {
 };
 
 const retrieveMemberByPassphrase = async (groupName, passphrase) => {
-  const allMembers = await getMembersFromgroupID({ TableName, groupID: groupName });
-  const memberFound = allMembers.find((member) => member.secretPassphrase === passphrase);
+  const allMembers = await getMembersFromgroupID({ TableName, groupID: groupName.toLowerCase() });
+  const memberFound = allMembers.find((member) => member.secretPassphrase === passphrase.toLowerCase());
 
   if (!memberFound) {
     return { error: 'I am unable to find your details, please ensure you have an account setup for santa\'s secret,  to do this go to secretsanta.mineshdesigns.co.uk/enrol. If you have an account already, check you have provided the correct information from the santa\'s secret email.' };
   }
-  if (passphrase && memberFound && memberFound.secretPassphrase !== passphrase) {
+  if (passphrase && memberFound && memberFound.secretPassphrase !== passphrase.toLowerCase()) {
     return { error: 'Passphrase is incorrect, please check email for details.' };
   }
   if (passphrase && memberFound) {
@@ -76,13 +76,13 @@ const secretSantaSkill = (event, context) => {
         }
         case 'AMAZON.HelpIntent': {
           const helpMessage = 'You can ask me the following, Ask secret santa to reveal santas secret? Ask secret santa what’s on my Wishlist? Ask secret santa what has my giftee wished for this christmas? Note! You must have a santas secret account to proceeed';
-          context.succeed(generateResponse(buildSpeechResponse(helpMessage, true)));
+          context.succeed(generateResponse(buildSpeechResponse(helpMessage, false)));
           break;
         }
         case 'RevealSecretSanta': {
-          const memberName = event.request.intent.slots.memberName.value.toLowerCase();
+          const memberName = event.request.intent.slots.memberName.value;
           const passphrase = event.request.intent.slots.passphrase.value;
-          const groupName = event.request.intent.slots.groupName.value.toLowerCase();
+          const groupName = event.request.intent.slots.groupName.value;
 
           if (memberName && groupName && passphrase) {
             const aloneConfirmation = event.request.intent.slots.aloneConfirmation.value.toUpperCase();
@@ -109,8 +109,8 @@ const secretSantaSkill = (event, context) => {
           break;
         }
         case 'ManageMyWishlist': {
-          const passphrase = event.request.intent.slots.passphrase.value.toLowerCase();
-          const groupName = event.request.intent.slots.groupName.value.toLowerCase();
+          const passphrase = event.request.intent.slots.passphrase.value;
+          const groupName = event.request.intent.slots.groupName.value;
 
           if (groupName && passphrase) {
             retrieveMemberByPassphrase(groupName, passphrase)
@@ -134,8 +134,8 @@ const secretSantaSkill = (event, context) => {
           break;
         }
         case 'RevealGifteesWishlist': {
-          const passphrase = event.request.intent.slots.passphrase.value.toLowerCase();
-          const groupName = event.request.intent.slots.groupName.value.toLowerCase();
+          const passphrase = event.request.intent.slots.passphrase.value;
+          const groupName = event.request.intent.slots.groupName.value;
 
           if (groupName && passphrase) {
             retrieveMemberByPassphrase(groupName, passphrase)
