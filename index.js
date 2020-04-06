@@ -18,9 +18,9 @@ const {
   sendEmailToMembers,
   sendEmailToMember,
   getMembersFromGroup
-} = require('./controller/secretSanta');
+} = require('./handlers/secretSanta');
 
-const { login } = require('./controller/auth');
+const { login } = require('./handlers/auth');
 
 const app = new Koa();
 
