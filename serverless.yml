@@ -51,7 +51,7 @@ provider:
 
 functions:
   app:
-    handler: index.handler
+    handler: slsHandler.handler
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'

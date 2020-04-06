@@ -1,0 +1,35 @@
+{
+  "tables": [{
+			"TableName": "secret-santa-api-local",
+			"AttributeDefinitions": [{
+        "AttributeName": "memberName",
+        "AttributeType": "S"
+      },
+      {
+        "AttributeName": "groupID",
+        "AttributeType": "S"
+      }
+    ],
+    "KeySchema": [{
+        "AttributeName": "memberName",
+        "KeyType": "HASH"
+      },
+      {
+        "AttributeName": "groupID",
+        "KeyType": "RANGE"
+      }
+    ],
+    "GlobalSecondaryIndexes": [{
+      "IndexName": "groupID-index",
+      "KeySchema": [{
+          "AttributeName": "groupID",
+          "KeyType": "HASH"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "ALL"
+      }
+    }],
+    "BillingMode": "PAY_PER_REQUEST"
+  }]
+}

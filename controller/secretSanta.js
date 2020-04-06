@@ -23,11 +23,7 @@ const setupgroupID = async (ctx) => {
   const memberNamesInDraw = data.reduce((acc, person) => [...acc, person.memberName], []);
 
   if (!isValidgroupID(memberNamesInDraw)) {
-    ctx.status = 404;
-    ctx.body = JSON.stringify({
-      error: 'Unable to create a group with less than two members.'
-    });
-    return;
+    ctx.throw(400, 'Unable to create a group with less than two members.');
   }
 
   const list = getCode;
@@ -64,13 +60,15 @@ const getGiftIdeas = async (ctx) => {
     groupID
   };
 
-  ctx.body = await getGiftIdeasForMember(payload);
+  const getGifts = await getGiftIdeasForMember(payload);
+  ctx.body = getGifts;
 };
 
 
 const addGiftIdeas = async (ctx) => {
   const { memberName, groupID } = ctx.params;
   const { giftIdeas } = ctx.request.body;
+
   if (giftIdeas.length < 1) ctx.response.status = 404;
 
   const payload = {
@@ -133,6 +131,7 @@ const removeGroup = async (ctx) => {
   const { groupID } = ctx.params;
 
   const secretSantaGroupMembersToDelete = await getMembersFromgroupID({ TableName, groupID });
+
   ctx.body = await removeSecretSantaGroup({ TableName, groupID, secretSantaGroupMembersToDelete });
 };
 

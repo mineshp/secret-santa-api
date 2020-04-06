@@ -1,11 +1,11 @@
-const { dbClient } = require('./dbClient');
+const dbClient = require('./dbClient');
 
 const setupSecretSantagroupID = ({ TableName, secretSantagroupID }) => Promise.all(
   secretSantagroupID.map((member) => dbClient.put({
     TableName,
     Item: { ...member }
-  }).promise()
-  ));
+  }))
+);
 
 const getGiftIdeasForMember = async ({
   TableName, memberName, groupID
@@ -20,7 +20,7 @@ const getGiftIdeasForMember = async ({
   };
 
   try {
-    return (await dbClient.get(params).promise()).Item;
+    return (await dbClient.get(params));
   } catch (error) {
     return { error: `AWS - ${error.message}` };
   }
@@ -41,7 +41,7 @@ const addGiftIdeasForMember = ({
     }
   };
 
-  return dbClient.update(params).promise()
+  return dbClient.update(params)
     .catch((e) => JSON.stringify({ error: e }));
 };
 
@@ -60,7 +60,7 @@ const addExclusionForMember = ({
     }
   };
 
-  return dbClient.update(params).promise()
+  return dbClient.update(params)
     .catch((e) => JSON.stringify({ error: e }));
 };
 
@@ -75,7 +75,7 @@ const getMembersFromgroupID = async ({ TableName, groupID }) => {
   };
 
   try {
-    return (await dbClient.query(params).promise()).Items;
+    return (await dbClient.query(params));
   } catch (error) {
     return { error: `AWS - ${error.message}` };
   }
@@ -96,9 +96,9 @@ const setSecretSantaForMember = ({ TableName, results, groupID }) => Promise.all
       }
     };
 
-    return dbClient.update(params).promise()
-      .then((data) => console.log(data) || JSON.stringify(data))
-      .catch((error) => console.log() || JSON.stringify({ error }));
+    return dbClient.update(params)
+      .then((data) => JSON.stringify(data))
+      .catch((error) => JSON.stringify({ error }));
   })
 );
 
@@ -114,7 +114,7 @@ const getMySecretSanta = async ({ TableName, memberName, groupID }) => {
   };
 
   try {
-    return (await dbClient.get(params).promise()).Item;
+    return (await dbClient.get(params));
   } catch (error) {
     return { error: `AWS - ${error.message}` };
   }
@@ -131,7 +131,7 @@ const getMember = async ({ TableName, memberName, groupID }) => {
   };
 
   try {
-    return (await dbClient.get(params).promise()).Item;
+    return (await dbClient.get(params));
   } catch (error) {
     return { error: `AWS - ${error.message}` };
   }
@@ -143,7 +143,7 @@ const getAllSecretSantaGroups = async ({ TableName }) => {
     ProjectionExpression: 'memberName,groupID'
   };
   try {
-    return (await dbClient.scan(params).promise()).Items;
+    return (await dbClient.scan(params));
   } catch (error) {
     return { error: `AWS - ${error.message}` };
   }
@@ -166,7 +166,7 @@ const removeSecretSantaGroup = async ({ TableName, groupID, secretSantaGroupMemb
   params.RequestItems[TableName] = Keys;
 
   try {
-    return (await dbClient.batchWrite(params).promise());
+    return (await dbClient.deleteMultiple(params));
   } catch (error) {
     return { error: `AWS - ${error.message}` };
   }

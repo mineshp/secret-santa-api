@@ -1,4 +1,3 @@
-const serverless = require('serverless-http');
 const Koa = require('koa');
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
@@ -25,9 +24,11 @@ const { login } = require('./controller/auth');
 
 const app = new Koa();
 
-const whitelist = process.env.WHITELIST.split(',');
-
 const checkOriginAgainstWhitelist = (ctx) => {
+  const whitelist = process.env.WHITELIST
+    ? process.env.WHITELIST.split(',')
+    : [];
+
   const requestOrigin = ctx.accept.headers.origin;
   if (!whitelist.includes(requestOrigin)) {
     return ctx.throw(`🙈 ${requestOrigin} is not a valid origin`);
@@ -57,10 +58,10 @@ router.put('/api/secretsanta/exclusions/:memberName/:groupID', jwt, addExclusion
 router.get('/api/secretsanta/:groupID', jwt, getMembersFromGroup);
 router.delete('/api/secretsanta/:groupID', jwt, removeGroup);
 
-app.on('error', (err) => {
-  console.log('server error', err);
+app.on('error', (err, ctx) => {
+  console.log('server error', err, ctx);
 });
 
 app.use(router.routes());
 
-module.exports.handler = serverless(app);
+module.exports = app;
