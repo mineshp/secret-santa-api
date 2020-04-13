@@ -152,9 +152,11 @@ const secretSantaSkill = (event, context) => {
                         context.succeed(generateResponse(buildSpeechResponse(errorMessage, true)));
                       } else if (giftIdeas.length > 0) {
                         const gifts = readList(giftIdeas);
+                        // eslint-disable-next-line max-len
                         const myGifteesWishlistMessage = `Hi ${response.memberName} your giftee has wished for ${gifts}, Happy Shopping!`;
                         context.succeed(generateResponse(buildSpeechResponse(myGifteesWishlistMessage, true)));
                       } else {
+                        // eslint-disable-next-line max-len
                         const myGifteesEmptyWishlistMessage = `Hi ${response.memberName} your giftee has no wishes, please try again later.`;
                         context.succeed(generateResponse(buildSpeechResponse(myGifteesEmptyWishlistMessage, true)));
                       }
