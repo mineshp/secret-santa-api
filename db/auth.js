@@ -1,4 +1,4 @@
-const { dbClient } = require('./dbClient');
+const dbClient = require('./dbClient');
 
 const isPassphraseValid = (passphraseInDB, userEnteredPassphrase) => passphraseInDB === userEnteredPassphrase;
 
@@ -13,7 +13,7 @@ const validateUser = async ({
     }
   };
   try {
-    const user = (await dbClient.get(params).promise()).Item;
+    const user = await dbClient.get(params);
     if (user && user.memberName) {
       return isPassphraseValid(user.secretPassphrase, passphrase)
         ? user
@@ -40,7 +40,7 @@ const setLoggedInTimestamp = async ({
     }
   };
 
-  return dbClient.update(params).promise()
+  return dbClient.update(params)
     .catch((e) => JSON.stringify({ error: e }));
 };
 
