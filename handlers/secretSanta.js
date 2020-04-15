@@ -12,7 +12,8 @@ const {
   getMySecretSanta,
   getAllSecretSantaGroups,
   removeSecretSantaGroup,
-  getMember
+  getMember,
+  updateGiftIdeasLastUpdated
 } = require('../db/secretSanta');
 
 const TableName = process.env.SECRET_SANTA_TABLE;
@@ -217,6 +218,19 @@ const getMembersFromGroup = async (ctx) => {
   }));
 };
 
+const setGiftIdeasLastUpdated = async (ctx) => {
+  const { memberName, groupID } = ctx.params;
+  const { giftIdeasLastUpdated } = ctx.request.body;
+
+  const payload = {
+    TableName,
+    memberName,
+    groupID,
+    giftIdeasLastUpdated
+  };
+  ctx.body = await updateGiftIdeasLastUpdated(payload);
+};
+
 
 module.exports = {
   setupgroupID,
@@ -229,5 +243,6 @@ module.exports = {
   removeGroup,
   sendEmailToMembers,
   sendEmailToMember,
-  getMembersFromGroup
+  getMembersFromGroup,
+  setGiftIdeasLastUpdated
 };

@@ -172,6 +172,25 @@ const removeSecretSantaGroup = async ({ TableName, groupID, secretSantaGroupMemb
   }
 };
 
+const updateGiftIdeasLastUpdated = async ({
+  TableName, memberName, groupID, giftIdeasLastUpdated
+}) => {
+  const params = {
+    TableName,
+    Key: {
+      memberName,
+      groupID
+    },
+    UpdateExpression: 'set giftIdeasLastUpdated = :gilu',
+    ExpressionAttributeValues: {
+      ':gilu': giftIdeasLastUpdated,
+    }
+  };
+
+  return dbClient.update(params)
+    .catch((e) => JSON.stringify({ error: e }));
+};
+
 module.exports = {
   setupSecretSantagroupID,
   getGiftIdeasForMember,
@@ -182,5 +201,6 @@ module.exports = {
   getMySecretSanta,
   getAllSecretSantaGroups,
   removeSecretSantaGroup,
-  getMember
+  getMember,
+  updateGiftIdeasLastUpdated
 };

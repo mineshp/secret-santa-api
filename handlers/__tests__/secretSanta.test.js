@@ -333,4 +333,18 @@ describe('secretSanta', () => {
     expect(status).toEqual(200);
     expect(JSON.parse(text)).toEqual(Payload);
   });
+
+  it('wishlist updated successfully', async () => {
+    const giftIdeasLastUpdated = new Date().toISOString();
+
+    const { status } = await request
+      .put('/api/secretsanta/giftIdeas/testUser1/localTestGroup/updated')
+      .set('Authorization', `Bearer ${testToken}`)
+      .send({ giftIdeasLastUpdated });
+
+    const giftIdeasUpdateDate = await getMember('testUser1', 'localTestGroup', 'giftIdeasLastUpdated');
+
+    expect(status).toEqual(200);
+    expect(giftIdeasUpdateDate).toEqual({ giftIdeasLastUpdated });
+  });
 });

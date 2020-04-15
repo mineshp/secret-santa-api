@@ -17,7 +17,8 @@ const {
   removeGroup,
   sendEmailToMembers,
   sendEmailToMember,
-  getMembersFromGroup
+  getMembersFromGroup,
+  setGiftIdeasLastUpdated
 } = require('./handlers/secretSanta');
 
 const { login } = require('./handlers/auth');
@@ -53,6 +54,7 @@ router.get('/api/secretsanta/admin/sendEmail/:groupID/:memberName', jwt, sendEma
 router.get('/api/secretsanta/admin/sendEmail/:groupID', jwt, sendEmailToMembers);
 router.get('/api/secretsanta/reveal/:memberName/:groupID', jwt, getSecretSanta);
 router.get('/api/secretsanta/giftIdeas/:memberName/:groupID', jwt, getGiftIdeas);
+router.put('/api/secretsanta/giftIdeas/:memberName/:groupID/updated', jwt, setGiftIdeasLastUpdated);
 router.put('/api/secretsanta/giftIdeas/:memberName/:groupID', jwt, addGiftIdeas);
 router.put('/api/secretsanta/exclusions/:memberName/:groupID', jwt, addExclusions);
 router.get('/api/secretsanta/:groupID', jwt, getMembersFromGroup);
