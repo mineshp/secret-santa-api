@@ -8,6 +8,7 @@ Jest-dynalite would then have to use advanced config
 */
 process.env.JWT_SECRET = 'testSecret';
 process.env.SECRET_SANTA_TABLE = 'secret-santa-api-local';
+
 const app = require('../..');
 const dbClient = require('../../db/dbClient');
 
@@ -19,7 +20,6 @@ const mockLambda = {
 };
 
 AWS.Lambda = jest.fn().mockImplementation(() => mockLambda);
-
 
 const testToken = jwt.sign(
   {
@@ -209,6 +209,21 @@ describe('secretSanta', () => {
   });
 
   it('gets all members from group successfully', async () => {
+    const taskActionDate = new Date().toISOString();
+    await dbClient.update({
+      TableName: process.env.SECRET_SANTA_TABLE,
+      Key: {
+        memberName: 'testUser1',
+        groupID: 'localTestGroup'
+      },
+      UpdateExpression: 'set giftIdeas = :gi, lastLoggedIn = :lli, giftIdeasLastUpdated = :gilu',
+      ExpressionAttributeValues: {
+        ':gi': ['foo', 'bar', 'baz'],
+        ':lli': taskActionDate,
+        ':gilu': taskActionDate
+      }
+    });
+
     const { status, text } = await request
       .get('/api/secretsanta/localTestGroup')
       .set('Authorization', `Bearer ${testToken}`);
@@ -221,7 +236,9 @@ describe('secretSanta', () => {
       {
         memberName: 'testUser1',
         admin: false,
-        drawn: false
+        drawn: false,
+        lastLoggedIn: taskActionDate,
+        giftIdeasLastUpdated: taskActionDate
       },
       {
         memberName: 'testUser2',

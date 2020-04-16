@@ -208,13 +208,14 @@ const getMembersFromGroup = async (ctx) => {
   const members = await getMembersFromgroupID({ TableName, groupID });
 
   ctx.body = members.map(({
-    memberName, email, secretSanta, admin, lastLoggedIn
+    memberName, email, secretSanta, admin, lastLoggedIn, giftIdeasLastUpdated
   }) => ({
     memberName,
     email,
     drawn: !!secretSanta,
     admin,
-    lastLoggedIn
+    lastLoggedIn,
+    giftIdeasLastUpdated
   }));
 };
 
