@@ -5,6 +5,8 @@ const koaBody = require('koa-body');
 const cors = require('@koa/cors');
 const convert = require('koa-convert');
 const jwt = require('./middlewares/jwt');
+const isAdmin = require('./middlewares/isAdmin');
+const errorHandler = require('./middlewares/errorHandler');
 
 const {
   setupgroupID,
@@ -47,21 +49,29 @@ router.get('/api', (ctx) => {
 });
 
 router.post('/api/user/login', login);
-router.post('/api/secretsanta/setup/:groupID', jwt, setupgroupID);
-router.get('/api/secretsanta/draw/:groupID', jwt, drawNames);
-router.get('/api/secretsanta/admin/allgroups', jwt, getAllGroups);
-router.get('/api/secretsanta/admin/sendEmail/:groupID/:memberName', jwt, sendEmailToMember);
-router.get('/api/secretsanta/admin/sendEmail/:groupID', jwt, sendEmailToMembers);
-router.get('/api/secretsanta/reveal/:memberName/:groupID', jwt, getSecretSanta);
-router.get('/api/secretsanta/giftIdeas/:memberName/:groupID', jwt, getGiftIdeas);
-router.put('/api/secretsanta/giftIdeas/:memberName/:groupID/updated', jwt, setGiftIdeasLastUpdated);
-router.put('/api/secretsanta/giftIdeas/:memberName/:groupID', jwt, addGiftIdeas);
-router.put('/api/secretsanta/exclusions/:memberName/:groupID', jwt, addExclusions);
-router.get('/api/secretsanta/:groupID', jwt, getMembersFromGroup);
-router.delete('/api/secretsanta/:groupID', jwt, removeGroup);
 
+router.get('/api/reveal/:memberName/:groupID', jwt, getSecretSanta);
+router.get('/api/giftIdeas/:memberName/:groupID', jwt, getGiftIdeas);
+router.put('/api/giftIdeas/:memberName/:groupID/updated', jwt, setGiftIdeasLastUpdated);
+router.put('/api/giftIdeas/:memberName/:groupID', jwt, addGiftIdeas);
+router.put('/api/exclusions/:memberName/:groupID', jwt, addExclusions);
+
+// Requires admin authorisation
+router.get('/api/admin/draw/:groupID', jwt, isAdmin, drawNames);
+router.get('/api/admin/allgroups', jwt, isAdmin, getAllGroups);
+router.get('/api/admin/sendEmail/:groupID', jwt, isAdmin, sendEmailToMembers);
+router.get('/api/admin/sendEmail/:groupID/:memberName', jwt, isAdmin, sendEmailToMember);
+router.get('/api/admin/:groupID', jwt, isAdmin, getMembersFromGroup);
+router.post('/api/admin/setup/:groupID', jwt, isAdmin, setupgroupID);
+router.delete('/api/admin/:groupID', jwt, isAdmin, removeGroup);
+
+app.use(errorHandler);
+
+// eslint-disable-next-line no-unused-vars
 app.on('error', (err, ctx) => {
-  console.log('server error', err, ctx);
+  console.log('API error', `${err.status}: ${err.message}`);
+  // console.log('Error received', err); // Uncomment for debugging
+  // console.log('Context object', ctx); // Uncomment for debugging
 });
 
 app.use(router.routes());

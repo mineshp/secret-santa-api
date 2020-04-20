@@ -21,9 +21,19 @@ const mockLambda = {
 
 AWS.Lambda = jest.fn().mockImplementation(() => mockLambda);
 
-const testToken = jwt.sign(
+const adminTestToken = jwt.sign(
   {
     memberName: 'rudolph',
+    groupID: 'testgroup',
+    email: 'test@test.com',
+    admin: true
+  },
+  process.env.JWT_SECRET
+);
+
+const nonAdminTestToken = jwt.sign(
+  {
+    memberName: 'dancer',
     groupID: 'testgroup',
     email: 'test@test.com',
     admin: false
@@ -49,8 +59,8 @@ const setupGroupForTesting = async (request) => {
   ];
 
   return request
-    .post(`/api/secretsanta/setup/${groupNameToSetup}`)
-    .set('Authorization', `Bearer ${testToken}`)
+    .post(`/api/admin/setup/${groupNameToSetup}`)
+    .set('Authorization', `Bearer ${adminTestToken}`)
     .send(newGroupPayload);
 };
 
@@ -119,8 +129,8 @@ describe('secretSanta', () => {
     ];
 
     const { status, text } = await request
-      .post(`/api/secretsanta/setup/${groupNameToSetup}`)
-      .set('Authorization', `Bearer ${testToken}`)
+      .post(`/api/admin/setup/${groupNameToSetup}`)
+      .set('Authorization', `Bearer ${adminTestToken}`)
       .send(newGroupPayload);
 
     expect(status).toEqual(400);
@@ -141,8 +151,8 @@ describe('secretSanta', () => {
     });
 
     const { status, text } = await request
-      .get('/api/secretsanta/giftIdeas/testUser1/localTestGroup')
-      .set('Authorization', `Bearer ${testToken}`);
+      .get('/api/giftIdeas/testUser1/localTestGroup')
+      .set('Authorization', `Bearer ${nonAdminTestToken}`);
 
     expect(status).toEqual(200);
     expect(JSON.parse(text)).toEqual({ giftIdeas: ['foo', 'bar', 'baz'] });
@@ -152,8 +162,8 @@ describe('secretSanta', () => {
     const giftIdeasToAdd = { giftIdeas: ['foo', 'bar', 'baz'] };
 
     const { status } = await request
-      .put('/api/secretsanta/giftIdeas/testUser1/localTestGroup')
-      .set('Authorization', `Bearer ${testToken}`)
+      .put('/api/giftIdeas/testUser1/localTestGroup')
+      .set('Authorization', `Bearer ${nonAdminTestToken}`)
       .send(giftIdeasToAdd);
 
     const { giftIdeas } = await getMember('testUser1', 'localTestGroup', 'giftIdeas');
@@ -162,12 +172,27 @@ describe('secretSanta', () => {
     expect(giftIdeas).toEqual(['foo', 'bar', 'baz']);
   });
 
+
+  it('wishlist updated successfully', async () => {
+    const giftIdeasLastUpdated = new Date().toISOString();
+
+    const { status } = await request
+      .put('/api/giftIdeas/testUser1/localTestGroup/updated')
+      .set('Authorization', `Bearer ${nonAdminTestToken}`)
+      .send({ giftIdeasLastUpdated });
+
+    const giftIdeasUpdateDate = await getMember('testUser1', 'localTestGroup', 'giftIdeasLastUpdated');
+
+    expect(status).toEqual(200);
+    expect(giftIdeasUpdateDate).toEqual({ giftIdeasLastUpdated });
+  });
+
   it('adds exclusions successfully', async () => {
     const exclusionsToAdd = { exclusions: ['santa', 'prancer'] };
 
     const { status } = await request
-      .put('/api/secretsanta/exclusions/testUser1/localTestGroup')
-      .set('Authorization', `Bearer ${testToken}`)
+      .put('/api/exclusions/testUser1/localTestGroup')
+      .set('Authorization', `Bearer ${nonAdminTestToken}`)
       .send(exclusionsToAdd);
 
     const { exclusions } = await getMember('testUser1', 'localTestGroup', 'exclusions');
@@ -176,27 +201,14 @@ describe('secretSanta', () => {
     expect(exclusions).toEqual(['santa', 'prancer']);
   });
 
-  it('draws names for a group', async () => {
-    const { status } = await request
-      .get('/api/secretsanta/draw/localTestGroup')
-      .set('Authorization', `Bearer ${testToken}`);
-
-    const testUser1DrawnWith = await getMember('testUser1', 'localTestGroup', 'secretSanta');
-    const testUser2DrawnWith = await getMember('testUser2', 'localTestGroup', 'secretSanta');
-
-    expect(status).toEqual(200);
-    expect(decodedStr(testUser1DrawnWith.secretSanta)).toEqual('testUser2');
-    expect(decodedStr(testUser2DrawnWith.secretSanta)).toEqual('testUser1');
-  });
-
   it('get my giftee', async () => {
     await request
-      .get('/api/secretsanta/draw/localTestGroup')
-      .set('Authorization', `Bearer ${testToken}`);
+      .get('/api/admin/draw/localTestGroup')
+      .set('Authorization', `Bearer ${adminTestToken}`);
 
     const { status, text } = await request
-      .get('/api/secretsanta/reveal/testUser2/localTestGroup')
-      .set('Authorization', `Bearer ${testToken}`);
+      .get('/api/reveal/testUser2/localTestGroup')
+      .set('Authorization', `Bearer ${nonAdminTestToken}`);
 
     expect(status).toEqual(200);
     expect(JSON.parse(text)).toMatchObject({
@@ -208,7 +220,21 @@ describe('secretSanta', () => {
     expect(myGiftee).toEqual('testUser1');
   });
 
-  it('gets all members from group successfully', async () => {
+  it('draws names for a group', async () => {
+    const { status } = await request
+      .get('/api/admin/draw/localTestGroup')
+      .set('Authorization', `Bearer ${adminTestToken}`);
+
+    const testUser1DrawnWith = await getMember('testUser1', 'localTestGroup', 'secretSanta');
+    const testUser2DrawnWith = await getMember('testUser2', 'localTestGroup', 'secretSanta');
+
+    expect(status).toEqual(200);
+    expect(decodedStr(testUser1DrawnWith.secretSanta)).toEqual('testUser2');
+    expect(decodedStr(testUser2DrawnWith.secretSanta)).toEqual('testUser1');
+  });
+
+
+  it('admin > gets all members from group successfully', async () => {
     const taskActionDate = new Date().toISOString();
     await dbClient.update({
       TableName: process.env.SECRET_SANTA_TABLE,
@@ -225,8 +251,8 @@ describe('secretSanta', () => {
     });
 
     const { status, text } = await request
-      .get('/api/secretsanta/localTestGroup')
-      .set('Authorization', `Bearer ${testToken}`);
+      .get('/api/admin/localTestGroup')
+      .set('Authorization', `Bearer ${adminTestToken}`);
 
     const groupMembers = JSON.parse(text);
 
@@ -250,8 +276,8 @@ describe('secretSanta', () => {
 
   it('admin > get all groups', async () => {
     const { status, text } = await request
-      .get('/api/secretsanta/admin/allgroups')
-      .set('Authorization', `Bearer ${testToken}`);
+      .get('/api/admin/allgroups')
+      .set('Authorization', `Bearer ${adminTestToken}`);
 
     const allGroups = JSON.parse(text);
 
@@ -265,8 +291,8 @@ describe('secretSanta', () => {
 
   it('admin > remove a group', async () => {
     const { status, text } = await request
-      .delete('/api/secretsanta/localTestGroup')
-      .set('Authorization', `Bearer ${testToken}`);
+      .delete('/api/admin/localTestGroup')
+      .set('Authorization', `Bearer ${adminTestToken}`);
 
     const getAllGroups = await dbClient.scan({
       TableName: process.env.SECRET_SANTA_TABLE,
@@ -276,6 +302,40 @@ describe('secretSanta', () => {
     expect(status).toEqual(200);
     expect(JSON.parse(text)).toEqual({ UnprocessedItems: {} });
     expect(getAllGroups).toHaveLength(0);
+  });
+
+  it('admin > send email to a member', async () => {
+    process.env.SEND_EMAIL_FUNCTION = 'test-email';
+
+    const testUser1 = await getMember('testUser1', 'localTestGroup', 'secretPassphrase');
+
+    const Payload = ({
+      mailConfig: {
+        subject: 'Secret Santa 2019 group LocalTestGroup  - The wait is over!'
+      },
+      groupName: 'localTestGroup',
+      members: [
+        {
+          memberName: 'testUser1',
+          secretPassphrase: testUser1.secretPassphrase
+        }
+      ]
+    });
+
+    mockLambda.invoke.mockReturnValue({
+      promise: () => Promise.resolve({ Payload })
+    });
+
+    const { status, text } = await request
+      .get('/api/admin/sendEmail/localTestGroup/testUser1')
+      .set('Authorization', `Bearer ${adminTestToken}`);
+
+    expect(mockLambda.invoke).toHaveBeenCalledWith({
+      FunctionName: 'test-email',
+      Payload: JSON.stringify(Payload, null, 2)
+    });
+    expect(status).toEqual(200);
+    expect(JSON.parse(text)).toEqual(Payload);
   });
 
   it('admin > send email to members', async () => {
@@ -306,8 +366,8 @@ describe('secretSanta', () => {
     });
 
     const { status, text } = await request
-      .get('/api/secretsanta/admin/sendEmail/localTestGroup')
-      .set('Authorization', `Bearer ${testToken}`);
+      .get('/api/admin/sendEmail/localTestGroup')
+      .set('Authorization', `Bearer ${adminTestToken}`);
 
     expect(mockLambda.invoke).toHaveBeenCalledWith({
       FunctionName: 'test-email',
@@ -315,53 +375,5 @@ describe('secretSanta', () => {
     });
     expect(status).toEqual(200);
     expect(JSON.parse(text)).toEqual(Payload);
-  });
-
-  it('admin > send email to a member', async () => {
-    process.env.SEND_EMAIL_FUNCTION = 'test-email';
-
-    const testUser1 = await getMember('testUser1', 'localTestGroup', 'secretPassphrase');
-
-    const Payload = ({
-      mailConfig: {
-        subject: 'Secret Santa 2019 group LocalTestGroup  - The wait is over!'
-      },
-      groupName: 'localTestGroup',
-      members: [
-        {
-          memberName: 'testUser1',
-          secretPassphrase: testUser1.secretPassphrase
-        }
-      ]
-    });
-
-    mockLambda.invoke.mockReturnValue({
-      promise: () => Promise.resolve({ Payload })
-    });
-
-    const { status, text } = await request
-      .get('/api/secretsanta/admin/sendEmail/localTestGroup/testUser1')
-      .set('Authorization', `Bearer ${testToken}`);
-
-    expect(mockLambda.invoke).toHaveBeenCalledWith({
-      FunctionName: 'test-email',
-      Payload: JSON.stringify(Payload, null, 2)
-    });
-    expect(status).toEqual(200);
-    expect(JSON.parse(text)).toEqual(Payload);
-  });
-
-  it('wishlist updated successfully', async () => {
-    const giftIdeasLastUpdated = new Date().toISOString();
-
-    const { status } = await request
-      .put('/api/secretsanta/giftIdeas/testUser1/localTestGroup/updated')
-      .set('Authorization', `Bearer ${testToken}`)
-      .send({ giftIdeasLastUpdated });
-
-    const giftIdeasUpdateDate = await getMember('testUser1', 'localTestGroup', 'giftIdeasLastUpdated');
-
-    expect(status).toEqual(200);
-    expect(giftIdeasUpdateDate).toEqual({ giftIdeasLastUpdated });
   });
 });
