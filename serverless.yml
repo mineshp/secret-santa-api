@@ -6,6 +6,8 @@ custom:
   jwtSecret: 'sn0wman2018$'
   senderEmail: 'mineshdesigns@gmail.com'
   sendEmailFunction: 'secret-santa-api-dev-send-email'
+  serverless-offline:
+    httpPort: 4000
 
 provider:
   name: aws
@@ -48,6 +50,9 @@ provider:
     JWT_SECRET: ${self:custom.jwtSecret}
     SENDER_EMAIL: ${self:custom.senderEmail}
     SEND_EMAIL_FUNCTION: ${self:custom.sendEmailFunction}
+
+plugins:
+  - serverless-offline
 
 functions:
   app:
