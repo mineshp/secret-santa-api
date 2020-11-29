@@ -1,8 +1,5 @@
 const generateTemplate = ({
-  memberName,
-  groupName,
-  drawYear,
-  secretPassphrase,
+  memberName, groupName, drawYear, secretPassphrase
 }) => `<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -59,7 +56,7 @@ img.fullwidth { max-width: 100%!important; }      img.fullwidthOnMobile { max-wi
                         <div style="font-size:12px;line-height:14px;font-family:Georgia, Times, 'Times New Roman', serif;color:#b15082;text-align:left;">
                           <p style="margin: 0;font-size: 14px;line-height: 17px;text-align: center">
                             <span style="font-size: 38px; line-height: 45px;">
-                              <span style="line-height: 45px; font-size: 38px;">Hello</span>
+                              <span style="line-height: 45px; font-size: 38px;">Hi</span>
                             </span>
                           </p>
                           <p style="margin: 0;font-size: 14px;line-height: 17px;text-align: center">
@@ -82,7 +79,7 @@ img.fullwidth { max-width: 100%!important; }      img.fullwidthOnMobile { max-wi
                         <div style="font-family:Georgia, Times, 'Times New Roman', serif;font-size:12px;line-height:14px;color:#555555;text-align:left;">
                           <p style="margin: 0;font-size: 12px;line-height: 14px;text-align: center">
                             <em>
-                              <span style="font-size: 34px; line-height: 40px;">Reveal your giftee below</span>
+                              <span style="font-size: 34px; line-height: 40px;">Reveal your secret santa below</span>
                             </em>
                           </p>
                         </div>
@@ -103,6 +100,36 @@ img.fullwidth { max-width: 100%!important; }      img.fullwidthOnMobile { max-wi
                       <div style="color:#989898;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:120%; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">
                         <div style="font-size:12px;line-height:14px;color:#989898;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align:left;">
                           <p style="margin: 0;font-size: 14px;line-height: 17px;text-align: center">MineshDesigns is proud to present the ${drawYear} Secret Santa Draw for the '${groupName}'. Open the link below and login using the following details to find out who your giftee is and what they have added to their wishlist, if you need gift ideas.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="">
+                      <div style="color:#b15082;font-family:Georgia, Times, 'Times New Roman', serif;line-height:120%; padding-right: 0px; padding-left: 0px; padding-top: 0px; padding-bottom: 5px;">
+                        <div style="font-size:12px;line-height:14px;font-family:Georgia, Times, 'Times New Roman', serif;color:#b15082;text-align:left;">
+                          <p style="margin: 0;font-size: 12px;line-height: 14px;text-align: center">
+                            <span style="font-size: 22px; line-height: 26px;">
+                              <span style="line-height: 26px; font-size: 22px;">Alexa integration is here</span>
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="">
+                      <div style="color:#989898;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:120%; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">
+                        <div style="font-size:12px;line-height:14px;color:#989898;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align:left;">
+                          <p style="margin: 0;font-size: 14px;line-height: 17px;text-align: center">If you have an Amazon Alexa device you can use it for secret santa. You can ask the following.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="">
+                      <div style="color:#989898;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:120%; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">
+                        <div style="font-size:12px;line-height:14px;color:#989898;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align:left;">
+                          <ul style="color:#b15082; margin: 0;font-size: 16px;line-height: 17px;" type="square">
+                              <li>Alexa ask secret santa to reveal santa's secret</li>
+                              <li>Alexa ask secret santa what’s on my Wishlist</li>
+                              <li>Alexa ask secret santa what has my giftee wished for this christmas?</li>
+                              <li>Alexa ask secret santa for santa's help</li>
+                          </ul>
                         </div>
                       </div>
                     </div>
@@ -228,7 +255,7 @@ img.fullwidth { max-width: 100%!important; }      img.fullwidthOnMobile { max-wi
                   <div style="border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
                     <div align="center" class="button-container center " style="padding-right: 10px; padding-left: 10px; padding-top:10px; padding-bottom:10px;">
                       <a href="http://secretsanta.mineshdesigns.co.uk" target="_blank" style="display: block;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #b15082; border-radius: 0px; -webkit-border-radius: 0px; -moz-border-radius: 0px; max-width: 218px; width: 178px;width: auto; border-top: 0px solid #A5CEA3; border-right: 0px solid #A5CEA3; border-bottom: 0px solid #A5CEA3; border-left: 0px solid #A5CEA3; padding-top: 5px; padding-right: 20px; padding-bottom: 5px; padding-left: 20px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;mso-border-alt: none">
-                        <span style="font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;font-size:16px;line-height:32px;">LOGIN TO SECRET SANTA</span>
+                        <span style="font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;font-size:16px;line-height:32px;">OPEN SECRET SANTA</span>
                       </a>
                     </div>
                   </div>

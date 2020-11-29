@@ -46,6 +46,7 @@
     "husky": "^4.2.3",
     "jest": "^24.8.0",
     "jest-dynalite": "^1.1.9",
+    "prettier": "2.2.1",
     "serverless-offline": "^6.4.0",
     "supertest": "^4.0.2"
   },
