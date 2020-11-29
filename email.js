@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const buildHTMLEmail = require('./email/templates/secretSanta_alexa_version');
+const buildHTMLEmail = require('./email/templates/secretSanta');
 
 const SES = new AWS.SES({ region: 'eu-west-1' });
 
@@ -44,7 +44,6 @@ const sendEmail = async (
 
 /* eslint-disable-next-line */
 const sendEmailToGroup = ({ groupName, members, mailConfig }) =>
-  // eslint-disable-next-line implicit-arrow-linebreak
   members.map((member) => sendEmail(groupName, member, mailConfig));
 
 module.exports.handler = sendEmailToGroup;

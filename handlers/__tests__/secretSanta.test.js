@@ -15,8 +15,8 @@ const dbClient = require('../../db/dbClient');
 const mockLambda = {
   invoke: jest.fn(() => ({
     promise: jest.fn(),
-    catch: jest.fn()
-  }))
+    catch: jest.fn(),
+  })),
 };
 
 AWS.Lambda = jest.fn().mockImplementation(() => mockLambda);
@@ -26,7 +26,7 @@ const adminTestToken = jwt.sign(
     memberName: 'rudolph',
     groupID: 'testgroup',
     email: 'test@test.com',
-    admin: true
+    admin: true,
   },
   process.env.JWT_SECRET
 );
@@ -36,7 +36,7 @@ const nonAdminTestToken = jwt.sign(
     memberName: 'dancer',
     groupID: 'testgroup',
     email: 'test@test.com',
-    admin: false
+    admin: false,
   },
   process.env.JWT_SECRET
 );
@@ -49,13 +49,13 @@ const setupGroupForTesting = async (request) => {
     {
       memberName: 'testUser1',
       groupID: groupNameToSetup,
-      passphrase: 'test1'
+      passphrase: 'test1',
     },
     {
       memberName: 'testUser2',
       groupID: groupNameToSetup,
-      passphrase: 'test2'
-    }
+      passphrase: 'test2',
+    },
   ];
 
   return request
@@ -64,25 +64,30 @@ const setupGroupForTesting = async (request) => {
     .send(newGroupPayload);
 };
 
-const getMember = async (memberName, groupID, fieldToReturn) => dbClient.get({
-  TableName: process.env.SECRET_SANTA_TABLE,
-  Key: {
-    memberName,
-    groupID
-  },
-  ProjectionExpression: fieldToReturn
-});
+const getMember = async (memberName, groupID, fieldToReturn) =>
+  dbClient.get({
+    TableName: process.env.SECRET_SANTA_TABLE,
+    Key: {
+      memberName,
+      groupID,
+    },
+    ProjectionExpression: fieldToReturn,
+  });
 
 describe('secretSanta', () => {
   let server = {};
   let request = {};
 
-  beforeAll((done) => { server = app.listen(done); });
+  beforeAll((done) => {
+    server = app.listen(done);
+  });
   beforeEach(async () => {
     request = supertest(server);
     await setupGroupForTesting(request);
   });
-  afterAll(() => { server.close(); });
+  afterAll(() => {
+    server.close();
+  });
 
   it('setup group success', async () => {
     const getAllMembersForGroup = await dbClient.query({
@@ -90,8 +95,8 @@ describe('secretSanta', () => {
       IndexName: 'groupID-index',
       KeyConditionExpression: 'groupID = :groupID',
       ExpressionAttributeValues: {
-        ':groupID': 'localTestGroup'
-      }
+        ':groupID': 'localTestGroup',
+      },
     });
 
     expect(getAllMembersForGroup).toMatchObject([
@@ -103,7 +108,7 @@ describe('secretSanta', () => {
         giftIdeas: [],
         passphrase: 'test1',
         secretPassphrase: getAllMembersForGroup[0].secretPassphrase, //  TODO: expect.any(String)
-        createdAt: getAllMembersForGroup[0].createdAt // TODO: expect.any(Date)
+        createdAt: getAllMembersForGroup[0].createdAt, // TODO: expect.any(Date)
       },
       {
         groupID: 'localTestGroup',
@@ -113,8 +118,8 @@ describe('secretSanta', () => {
         giftIdeas: [],
         passphrase: 'test2',
         secretPassphrase: getAllMembersForGroup[1].secretPassphrase, // TODO:  expect.any
-        createdAt: getAllMembersForGroup[1].createdAt // TODO: expect.any(Date)
-      }
+        createdAt: getAllMembersForGroup[1].createdAt, // TODO: expect.any(Date)
+      },
     ]);
   });
 
@@ -124,8 +129,8 @@ describe('secretSanta', () => {
       {
         memberName: 'testUser1',
         groupID: groupNameToSetup,
-        passphrase: 'test1'
-      }
+        passphrase: 'test1',
+      },
     ];
 
     const { status, text } = await request
@@ -134,7 +139,9 @@ describe('secretSanta', () => {
       .send(newGroupPayload);
 
     expect(status).toEqual(400);
-    expect(text).toEqual('Unable to create a group with less than two members.');
+    expect(text).toEqual(
+      'Unable to create a group with less than two members.'
+    );
   });
 
   it('gets giftIdeas successfully', async () => {
@@ -142,12 +149,12 @@ describe('secretSanta', () => {
       TableName: process.env.SECRET_SANTA_TABLE,
       Key: {
         memberName: 'testUser1',
-        groupID: 'localTestGroup'
+        groupID: 'localTestGroup',
       },
       UpdateExpression: 'set giftIdeas = :gi',
       ExpressionAttributeValues: {
         ':gi': ['foo', 'bar', 'baz'],
-      }
+      },
     });
 
     const { status, text } = await request
@@ -166,12 +173,15 @@ describe('secretSanta', () => {
       .set('Authorization', `Bearer ${nonAdminTestToken}`)
       .send(giftIdeasToAdd);
 
-    const { giftIdeas } = await getMember('testUser1', 'localTestGroup', 'giftIdeas');
+    const { giftIdeas } = await getMember(
+      'testUser1',
+      'localTestGroup',
+      'giftIdeas'
+    );
 
     expect(status).toEqual(200);
     expect(giftIdeas).toEqual(['foo', 'bar', 'baz']);
   });
-
 
   it('wishlist updated successfully', async () => {
     const giftIdeasLastUpdated = new Date().toISOString();
@@ -181,7 +191,11 @@ describe('secretSanta', () => {
       .set('Authorization', `Bearer ${nonAdminTestToken}`)
       .send({ giftIdeasLastUpdated });
 
-    const giftIdeasUpdateDate = await getMember('testUser1', 'localTestGroup', 'giftIdeasLastUpdated');
+    const giftIdeasUpdateDate = await getMember(
+      'testUser1',
+      'localTestGroup',
+      'giftIdeasLastUpdated'
+    );
 
     expect(status).toEqual(200);
     expect(giftIdeasUpdateDate).toEqual({ giftIdeasLastUpdated });
@@ -195,7 +209,11 @@ describe('secretSanta', () => {
       .set('Authorization', `Bearer ${nonAdminTestToken}`)
       .send(exclusionsToAdd);
 
-    const { exclusions } = await getMember('testUser1', 'localTestGroup', 'exclusions');
+    const { exclusions } = await getMember(
+      'testUser1',
+      'localTestGroup',
+      'exclusions'
+    );
 
     expect(status).toEqual(200);
     expect(exclusions).toEqual(['santa', 'prancer']);
@@ -212,7 +230,7 @@ describe('secretSanta', () => {
 
     expect(status).toEqual(200);
     expect(JSON.parse(text)).toMatchObject({
-      secretSanta: expect.any(String)
+      secretSanta: expect.any(String),
     });
 
     const { secretSanta } = JSON.parse(text);
@@ -225,14 +243,21 @@ describe('secretSanta', () => {
       .get('/api/admin/draw/localTestGroup')
       .set('Authorization', `Bearer ${adminTestToken}`);
 
-    const testUser1DrawnWith = await getMember('testUser1', 'localTestGroup', 'secretSanta');
-    const testUser2DrawnWith = await getMember('testUser2', 'localTestGroup', 'secretSanta');
+    const testUser1DrawnWith = await getMember(
+      'testUser1',
+      'localTestGroup',
+      'secretSanta'
+    );
+    const testUser2DrawnWith = await getMember(
+      'testUser2',
+      'localTestGroup',
+      'secretSanta'
+    );
 
     expect(status).toEqual(200);
     expect(decodedStr(testUser1DrawnWith.secretSanta)).toEqual('testUser2');
     expect(decodedStr(testUser2DrawnWith.secretSanta)).toEqual('testUser1');
   });
-
 
   it('admin > gets all members from group successfully', async () => {
     const taskActionDate = new Date().toISOString();
@@ -240,14 +265,15 @@ describe('secretSanta', () => {
       TableName: process.env.SECRET_SANTA_TABLE,
       Key: {
         memberName: 'testUser1',
-        groupID: 'localTestGroup'
+        groupID: 'localTestGroup',
       },
-      UpdateExpression: 'set giftIdeas = :gi, lastLoggedIn = :lli, giftIdeasLastUpdated = :gilu',
+      UpdateExpression:
+        'set giftIdeas = :gi, lastLoggedIn = :lli, giftIdeasLastUpdated = :gilu',
       ExpressionAttributeValues: {
         ':gi': ['foo', 'bar', 'baz'],
         ':lli': taskActionDate,
-        ':gilu': taskActionDate
-      }
+        ':gilu': taskActionDate,
+      },
     });
 
     const { status, text } = await request
@@ -264,13 +290,13 @@ describe('secretSanta', () => {
         admin: false,
         drawn: false,
         lastLoggedIn: taskActionDate,
-        giftIdeasLastUpdated: taskActionDate
+        giftIdeasLastUpdated: taskActionDate,
       },
       {
         memberName: 'testUser2',
         admin: false,
-        drawn: false
-      }
+        drawn: false,
+      },
     ]);
   });
 
@@ -283,10 +309,12 @@ describe('secretSanta', () => {
 
     expect(status).toEqual(200);
     expect(allGroups).toHaveLength(1);
-    expect(allGroups).toEqual([{
-      groupName: 'localTestGroup',
-      count: 2 // number of members
-    }]);
+    expect(allGroups).toEqual([
+      {
+        groupName: 'localTestGroup',
+        count: 2, // number of members
+      },
+    ]);
   });
 
   it('admin > remove a group', async () => {
@@ -296,7 +324,7 @@ describe('secretSanta', () => {
 
     const getAllGroups = await dbClient.scan({
       TableName: process.env.SECRET_SANTA_TABLE,
-      ProjectionExpression: 'memberName,groupID'
+      ProjectionExpression: 'memberName,groupID',
     });
 
     expect(status).toEqual(200);
@@ -307,23 +335,27 @@ describe('secretSanta', () => {
   it('admin > send email to a member', async () => {
     process.env.SEND_EMAIL_FUNCTION = 'test-email';
 
-    const testUser1 = await getMember('testUser1', 'localTestGroup', 'secretPassphrase');
+    const testUser1 = await getMember(
+      'testUser1',
+      'localTestGroup',
+      'secretPassphrase'
+    );
 
-    const Payload = ({
+    const Payload = {
       mailConfig: {
-        subject: 'Secret Santa 2019 group LocalTestGroup  - The wait is over!'
+        subject: `Secret Santa ${new Date().getFullYear()} group LocalTestGroup  - The wait is over!`,
       },
       groupName: 'localTestGroup',
       members: [
         {
           memberName: 'testUser1',
-          secretPassphrase: testUser1.secretPassphrase
-        }
-      ]
-    });
+          secretPassphrase: testUser1.secretPassphrase,
+        },
+      ],
+    };
 
     mockLambda.invoke.mockReturnValue({
-      promise: () => Promise.resolve({ Payload })
+      promise: () => Promise.resolve({ Payload }),
     });
 
     const { status, text } = await request
@@ -332,7 +364,7 @@ describe('secretSanta', () => {
 
     expect(mockLambda.invoke).toHaveBeenCalledWith({
       FunctionName: 'test-email',
-      Payload: JSON.stringify(Payload, null, 2)
+      Payload: JSON.stringify(Payload, null, 2),
     });
     expect(status).toEqual(200);
     expect(JSON.parse(text)).toEqual(Payload);
@@ -341,28 +373,36 @@ describe('secretSanta', () => {
   it('admin > send email to members', async () => {
     process.env.SEND_EMAIL_FUNCTION = 'test-email';
 
-    const testUser1 = await getMember('testUser1', 'localTestGroup', 'secretPassphrase');
-    const testUser2 = await getMember('testUser2', 'localTestGroup', 'secretPassphrase');
+    const testUser1 = await getMember(
+      'testUser1',
+      'localTestGroup',
+      'secretPassphrase'
+    );
+    const testUser2 = await getMember(
+      'testUser2',
+      'localTestGroup',
+      'secretPassphrase'
+    );
 
-    const Payload = ({
+    const Payload = {
       mailConfig: {
-        subject: 'Secret Santa 2019 group LocalTestGroup  - The wait is over!'
+        subject: `Secret Santa ${new Date().getFullYear()} group LocalTestGroup  - The wait is over!`,
       },
       groupName: 'localTestGroup',
       members: [
         {
           memberName: 'testUser1',
-          secretPassphrase: testUser1.secretPassphrase
+          secretPassphrase: testUser1.secretPassphrase,
         },
         {
           memberName: 'testUser2',
-          secretPassphrase: testUser2.secretPassphrase
-        }
-      ]
-    });
+          secretPassphrase: testUser2.secretPassphrase,
+        },
+      ],
+    };
 
     mockLambda.invoke.mockReturnValue({
-      promise: () => Promise.resolve({ Payload })
+      promise: () => Promise.resolve({ Payload }),
     });
 
     const { status, text } = await request
@@ -371,7 +411,7 @@ describe('secretSanta', () => {
 
     expect(mockLambda.invoke).toHaveBeenCalledWith({
       FunctionName: 'test-email',
-      Payload: JSON.stringify(Payload, null, 2)
+      Payload: JSON.stringify(Payload, null, 2),
     });
     expect(status).toEqual(200);
     expect(JSON.parse(text)).toEqual(Payload);

@@ -25,7 +25,7 @@ module.exports = {
       },
     ],
     'linebreak-style': ['error', 'unix'],
-    'implicit-arrow-linebreak': ['error', 'beside'],
+    'implicit-arrow-linebreak': 'off',
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
     'no-console': 'off',

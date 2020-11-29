@@ -13,7 +13,7 @@ const {
   getAllSecretSantaGroups,
   removeSecretSantaGroup,
   getMember,
-  updateGiftIdeasLastUpdated
+  updateGiftIdeasLastUpdated,
 } = require('../db/secretSanta');
 
 const TableName = process.env.SECRET_SANTA_TABLE;
@@ -21,7 +21,10 @@ const TableName = process.env.SECRET_SANTA_TABLE;
 const setupgroupID = async (ctx) => {
   const { groupID } = ctx.params;
   const data = ctx.request.body;
-  const memberNamesInDraw = data.reduce((acc, person) => [...acc, person.memberName], []);
+  const memberNamesInDraw = data.reduce(
+    (acc, person) => [...acc, person.memberName],
+    []
+  );
 
   if (!isValidgroupID(memberNamesInDraw)) {
     ctx.throw(400, 'Unable to create a group with less than two members.');
@@ -40,13 +43,13 @@ const setupgroupID = async (ctx) => {
       createdAt: new Date().toISOString(),
       giftIdeas: [],
       exclusions: [],
-      admin: false
+      admin: false,
     };
   });
 
   const payload = {
     TableName,
-    secretSantagroupID
+    secretSantagroupID,
   };
 
   ctx.body = await setupSecretSantagroupID(payload);
@@ -58,13 +61,12 @@ const getGiftIdeas = async (ctx) => {
   const payload = {
     TableName,
     memberName,
-    groupID
+    groupID,
   };
 
   const getGifts = await getGiftIdeasForMember(payload);
   ctx.body = getGifts;
 };
-
 
 const addGiftIdeas = async (ctx) => {
   const { memberName, groupID } = ctx.params;
@@ -76,7 +78,7 @@ const addGiftIdeas = async (ctx) => {
     TableName,
     memberName,
     groupID,
-    giftIdeas
+    giftIdeas,
   };
   ctx.body = await addGiftIdeasForMember(payload);
 };
@@ -91,7 +93,7 @@ const addExclusions = async (ctx) => {
     TableName,
     memberName,
     groupID,
-    exclusions
+    exclusions,
   };
 
   ctx.body = await addExclusionForMember(payload);
@@ -99,10 +101,17 @@ const addExclusions = async (ctx) => {
 
 const drawNames = async (ctx) => {
   const { groupID } = ctx.params;
-  const secretSantaGroupMembersInfo = await getMembersFromgroupID({ TableName, groupID });
+  const secretSantaGroupMembersInfo = await getMembersFromgroupID({
+    TableName,
+    groupID,
+  });
 
   const namesInHat = getListOfNames(secretSantaGroupMembersInfo);
-  const results = generateDraw(namesInHat, Object.assign([], namesInHat), secretSantaGroupMembersInfo);
+  const results = generateDraw(
+    namesInHat,
+    Object.assign([], namesInHat),
+    secretSantaGroupMembersInfo
+  );
 
   ctx.body = await setSecretSantaForMember({ TableName, results, groupID });
 };
@@ -116,14 +125,24 @@ const getSecretSanta = async (ctx) => {
 const getAllGroups = async (ctx) => {
   const allGroups = await getAllSecretSantaGroups({ TableName });
 
-  const countMembers = ({ groupID }, data) => data.filter((d) => d.groupID === groupID).length;
+  const countMembers = ({ groupID }, data) =>
+    data.filter((d) => d.groupID === groupID).length;
 
-  const parsedGroups = allGroups.reduce((acc, val, i, arr) => [...acc,
-    {
-      groupName: val.groupID,
-      count: countMembers(val, arr)
-    }], []
-  ).filter((group, index, arr) => arr.findIndex((t) => (t.groupName === group.groupName)) === index);
+  const parsedGroups = allGroups
+    .reduce(
+      (acc, val, i, arr) => [
+        ...acc,
+        {
+          groupName: val.groupID,
+          count: countMembers(val, arr),
+        },
+      ],
+      []
+    )
+    .filter(
+      (group, index, arr) =>
+        arr.findIndex((t) => t.groupName === group.groupName) === index
+    );
 
   ctx.body = parsedGroups;
 };
@@ -131,42 +150,58 @@ const getAllGroups = async (ctx) => {
 const removeGroup = async (ctx) => {
   const { groupID } = ctx.params;
 
-  const secretSantaGroupMembersToDelete = await getMembersFromgroupID({ TableName, groupID });
+  const secretSantaGroupMembersToDelete = await getMembersFromgroupID({
+    TableName,
+    groupID,
+  });
 
-  ctx.body = await removeSecretSantaGroup({ TableName, groupID, secretSantaGroupMembersToDelete });
+  ctx.body = await removeSecretSantaGroup({
+    TableName,
+    groupID,
+    secretSantaGroupMembersToDelete,
+  });
 };
 
 const sendEmailToMembers = async (ctx) => {
   const { groupID } = ctx.params;
 
-  const secretSantaGroupMembers = await getMembersFromgroupID({ TableName, groupID });
+  const secretSantaGroupMembers = await getMembersFromgroupID({
+    TableName,
+    groupID,
+  });
 
-  const members = secretSantaGroupMembers.map(({ memberName, secretPassphrase, email }) => ({
-    memberName,
-    secretPassphrase,
-    email
-  }));
+  const members = secretSantaGroupMembers.map(
+    ({ memberName, secretPassphrase, email }) => ({
+      memberName,
+      secretPassphrase,
+      email,
+    })
+  );
 
-  const subject = `Secret Santa 2019 group ${groupID.charAt(0).toUpperCase() + groupID.slice(1)}  - The wait is over!`;
+  const subject = `Secret Santa ${new Date().getFullYear()} group ${
+    groupID.charAt(0).toUpperCase() + groupID.slice(1)
+  }  - The wait is over!`;
 
   const emailParams = {
     mailConfig: {
       from: process.env.SENDER_EMAIL,
       replyTo: process.env.SENDER_EMAIL,
-      subject
+      subject,
     },
     groupName: groupID,
-    members
+    members,
   };
 
   const lambda = new AWS.Lambda({
-    region: 'eu-west-1'
+    region: 'eu-west-1',
   });
 
-  const response = await lambda.invoke({
-    FunctionName: process.env.SEND_EMAIL_FUNCTION,
-    Payload: JSON.stringify(emailParams, null, 2) // pass params
-  }).promise()
+  const response = await lambda
+    .invoke({
+      FunctionName: process.env.SEND_EMAIL_FUNCTION,
+      Payload: JSON.stringify(emailParams, null, 2), // pass params
+    })
+    .promise()
     .catch((err) => console.error(err));
 
   ctx.body = response.Payload;
@@ -175,28 +210,34 @@ const sendEmailToMembers = async (ctx) => {
 const sendEmailToMember = async (ctx) => {
   const { groupID, memberName } = ctx.params;
 
-  const members = new Array(await getMember({ TableName, memberName, groupID }));
+  const members = new Array(
+    await getMember({ TableName, memberName, groupID })
+  );
 
-  const subject = `Secret Santa 2019 group ${groupID.charAt(0).toUpperCase() + groupID.slice(1)}  - The wait is over!`;
+  const subject = `Secret Santa ${new Date().getFullYear()} group ${
+    groupID.charAt(0).toUpperCase() + groupID.slice(1)
+  }  - The wait is over!`;
 
   const emailParams = {
     mailConfig: {
       from: process.env.SENDER_EMAIL,
       replyTo: process.env.SENDER_EMAIL,
-      subject
+      subject,
     },
     groupName: groupID,
-    members
+    members,
   };
 
   const lambda = new AWS.Lambda({
-    region: 'eu-west-1'
+    region: 'eu-west-1',
   });
 
-  const response = await lambda.invoke({
-    FunctionName: process.env.SEND_EMAIL_FUNCTION,
-    Payload: JSON.stringify(emailParams, null, 2) // pass params
-  }).promise()
+  const response = await lambda
+    .invoke({
+      FunctionName: process.env.SEND_EMAIL_FUNCTION,
+      Payload: JSON.stringify(emailParams, null, 2), // pass params
+    })
+    .promise()
     .catch((err) => console.error(err));
 
   ctx.body = response.Payload;
@@ -207,16 +248,23 @@ const getMembersFromGroup = async (ctx) => {
 
   const members = await getMembersFromgroupID({ TableName, groupID });
 
-  ctx.body = members.map(({
-    memberName, email, secretSanta, admin, lastLoggedIn, giftIdeasLastUpdated
-  }) => ({
-    memberName,
-    email,
-    drawn: !!secretSanta,
-    admin,
-    lastLoggedIn,
-    giftIdeasLastUpdated
-  }));
+  ctx.body = members.map(
+    ({
+      memberName,
+      email,
+      secretSanta,
+      admin,
+      lastLoggedIn,
+      giftIdeasLastUpdated,
+    }) => ({
+      memberName,
+      email,
+      drawn: !!secretSanta,
+      admin,
+      lastLoggedIn,
+      giftIdeasLastUpdated,
+    })
+  );
 };
 
 const setGiftIdeasLastUpdated = async (ctx) => {
@@ -227,11 +275,10 @@ const setGiftIdeasLastUpdated = async (ctx) => {
     TableName,
     memberName,
     groupID,
-    giftIdeasLastUpdated
+    giftIdeasLastUpdated,
   };
   ctx.body = await updateGiftIdeasLastUpdated(payload);
 };
-
 
 module.exports = {
   setupgroupID,
@@ -245,5 +292,5 @@ module.exports = {
   sendEmailToMembers,
   sendEmailToMember,
   getMembersFromGroup,
-  setGiftIdeasLastUpdated
+  setGiftIdeasLastUpdated,
 };
