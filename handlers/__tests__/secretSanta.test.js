@@ -1,25 +1,20 @@
-const AWS = require('aws-sdk');
 const supertest = require('supertest');
 const jwt = require('jsonwebtoken');
+const lambda = require('../../services/lambda');
+
+jest.mock('../../services/lambda');
 
 /* These env variables could also be done in a setupBeforeEnv.js file
 and added to jest config in package.json.
 Jest-dynalite would then have to use advanced config
 */
+
 process.env.JWT_SECRET = 'testSecret';
 process.env.SECRET_SANTA_TABLE = 'secret-santa-api-local';
+process.env.SEND_EMAIL_FUNCTION = 'test-email';
 
 const app = require('../..');
 const dbClient = require('../../db/dbClient');
-
-const mockLambda = {
-  invoke: jest.fn(() => ({
-    promise: jest.fn(),
-    catch: jest.fn(),
-  })),
-};
-
-AWS.Lambda = jest.fn().mockImplementation(() => mockLambda);
 
 const adminTestToken = jwt.sign(
   {
@@ -239,6 +234,8 @@ describe('secretSanta', () => {
   });
 
   it('draws names for a group', async () => {
+    lambda.invoke.mockResolvedValue({});
+
     const { status } = await request
       .get('/api/admin/draw/localTestGroup')
       .set('Authorization', `Bearer ${adminTestToken}`);
@@ -255,8 +252,16 @@ describe('secretSanta', () => {
     );
 
     expect(status).toEqual(200);
+
     expect(decodedStr(testUser1DrawnWith.secretSanta)).toEqual('testUser2');
     expect(decodedStr(testUser2DrawnWith.secretSanta)).toEqual('testUser1');
+
+    expect(lambda.invoke).toHaveBeenCalledWith({
+      FunctionName: 'test-email',
+      Payload: expect.stringContaining(
+        `Secret Santa ${new Date().getFullYear()} group LocalTestGroup  - The wait is over!`
+      ),
+    });
   });
 
   it('admin > gets all members from group successfully', async () => {
@@ -333,8 +338,6 @@ describe('secretSanta', () => {
   });
 
   it('admin > send email to a member', async () => {
-    process.env.SEND_EMAIL_FUNCTION = 'test-email';
-
     const testUser1 = await getMember(
       'testUser1',
       'localTestGroup',
@@ -354,15 +357,13 @@ describe('secretSanta', () => {
       ],
     };
 
-    mockLambda.invoke.mockReturnValue({
-      promise: () => Promise.resolve({ Payload }),
-    });
+    lambda.invoke.mockResolvedValue({ Payload });
 
     const { status, text } = await request
       .get('/api/admin/sendEmail/localTestGroup/testUser1')
       .set('Authorization', `Bearer ${adminTestToken}`);
 
-    expect(mockLambda.invoke).toHaveBeenCalledWith({
+    expect(await lambda.invoke).toHaveBeenCalledWith({
       FunctionName: 'test-email',
       Payload: JSON.stringify(Payload, null, 2),
     });
@@ -371,8 +372,6 @@ describe('secretSanta', () => {
   });
 
   it('admin > send email to members', async () => {
-    process.env.SEND_EMAIL_FUNCTION = 'test-email';
-
     const testUser1 = await getMember(
       'testUser1',
       'localTestGroup',
@@ -401,15 +400,13 @@ describe('secretSanta', () => {
       ],
     };
 
-    mockLambda.invoke.mockReturnValue({
-      promise: () => Promise.resolve({ Payload }),
-    });
+    lambda.invoke.mockResolvedValue({ Payload });
 
     const { status, text } = await request
       .get('/api/admin/sendEmail/localTestGroup')
       .set('Authorization', `Bearer ${adminTestToken}`);
 
-    expect(mockLambda.invoke).toHaveBeenCalledWith({
+    expect(await lambda.invoke).toHaveBeenCalledWith({
       FunctionName: 'test-email',
       Payload: JSON.stringify(Payload, null, 2),
     });

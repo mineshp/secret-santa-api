@@ -15,7 +15,7 @@ const sendEmail = async (
     memberName,
     groupName,
     secretPassphrase,
-    drawYear: '2020',
+    drawYear: new Date().getFullYear(),
   });
 
   const sesParams = {

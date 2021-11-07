@@ -62,6 +62,18 @@ functions:
       - http: 'ANY {proxy+}'
   send-email:
     handler: email.handler
+  santaDrawEmail:
+    handler: streamHandlers/drawGenerated.handler
+    events:
+    - stream:
+        type: dynamodb
+        arn:
+          Fn::GetAtt:
+            - DynamoDBTable
+            - StreamArn
+        startingPosition: LATEST
+        batchSize: 10
+        maximumRetryAttempts: 3
   alexa-secret-santa-skill:
     handler: skill.handler
     events:
@@ -94,4 +106,6 @@ resources:
             KeyType: HASH
           Projection:
             ProjectionType: ALL
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
         TableName: ${self:custom.tableName}

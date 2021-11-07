@@ -1,7 +1,7 @@
-const AWS = require('aws-sdk');
 const getCode = require('../utilities/getCode');
 const { isValidgroupID } = require('../validator');
 const { getListOfNames, generateDraw } = require('../utilities/draw');
+const drawGenerated = require('../email/drawGenerated');
 const {
   setupSecretSantagroupID,
   getGiftIdeasForMember,
@@ -113,7 +113,30 @@ const drawNames = async (ctx) => {
     secretSantaGroupMembersInfo
   );
 
-  ctx.body = await setSecretSantaForMember({ TableName, results, groupID });
+  const drawHasBeenSavedToDB = await setSecretSantaForMember({
+    TableName,
+    results,
+    groupID,
+  });
+
+  const secretSantaGroupMembers = await getMembersFromgroupID({
+    TableName,
+    groupID,
+  });
+
+  const members = secretSantaGroupMembers.map(
+    ({ memberName, secretPassphrase, email }) => ({
+      memberName,
+      secretPassphrase,
+      email,
+    })
+  );
+
+  if (drawHasBeenSavedToDB) {
+    await drawGenerated.sendEmail(groupID, members);
+  }
+
+  ctx.body = drawHasBeenSavedToDB;
 };
 
 const getSecretSanta = async (ctx) => {
@@ -178,32 +201,7 @@ const sendEmailToMembers = async (ctx) => {
     })
   );
 
-  const subject = `Secret Santa ${new Date().getFullYear()} group ${
-    groupID.charAt(0).toUpperCase() + groupID.slice(1)
-  }  - The wait is over!`;
-
-  const emailParams = {
-    mailConfig: {
-      from: process.env.SENDER_EMAIL,
-      replyTo: process.env.SENDER_EMAIL,
-      subject,
-    },
-    groupName: groupID,
-    members,
-  };
-
-  const lambda = new AWS.Lambda({
-    region: 'eu-west-1',
-  });
-
-  const response = await lambda
-    .invoke({
-      FunctionName: process.env.SEND_EMAIL_FUNCTION,
-      Payload: JSON.stringify(emailParams, null, 2), // pass params
-    })
-    .promise()
-    .catch((err) => console.error(err));
-
+  const response = await drawGenerated.sendEmail(groupID, members);
   ctx.body = response.Payload;
 };
 
@@ -214,31 +212,7 @@ const sendEmailToMember = async (ctx) => {
     await getMember({ TableName, memberName, groupID })
   );
 
-  const subject = `Secret Santa ${new Date().getFullYear()} group ${
-    groupID.charAt(0).toUpperCase() + groupID.slice(1)
-  }  - The wait is over!`;
-
-  const emailParams = {
-    mailConfig: {
-      from: process.env.SENDER_EMAIL,
-      replyTo: process.env.SENDER_EMAIL,
-      subject,
-    },
-    groupName: groupID,
-    members,
-  };
-
-  const lambda = new AWS.Lambda({
-    region: 'eu-west-1',
-  });
-
-  const response = await lambda
-    .invoke({
-      FunctionName: process.env.SEND_EMAIL_FUNCTION,
-      Payload: JSON.stringify(emailParams, null, 2), // pass params
-    })
-    .promise()
-    .catch((err) => console.error(err));
+  const response = await drawGenerated.sendEmail(groupID, members);
 
   ctx.body = response.Payload;
 };
