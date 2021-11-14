@@ -78,8 +78,9 @@ const addGiftIdeas = async (ctx) => {
     TableName,
     memberName,
     groupID,
-    giftIdeas,
+    giftIdeas: giftIdeas.map((g) => decodeURI(g)),
   };
+
   ctx.body = await addGiftIdeasForMember(payload);
 };
 

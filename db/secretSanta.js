@@ -44,7 +44,6 @@ const addGiftIdeasForMember = ({
       ':gi': giftIdeas,
     },
   };
-
   return dbClient.update(params).catch((e) => JSON.stringify({ error: e }));
 };
 
