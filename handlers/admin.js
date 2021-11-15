@@ -1,22 +1,41 @@
-const getCode = require('../utilities/getCode');
-const { isValidgroupID } = require('../validator');
 const { getListOfNames, generateDraw } = require('../utilities/draw');
 const drawGenerated = require('../email/drawGenerated');
+const getCode = require('../utilities/getCode');
+const { isValidgroupID } = require('../validator');
+const { setupSecretSantagroupID } = require('../db/admin');
 const {
-  setupSecretSantagroupID,
-  getGiftIdeasForMember,
-  addGiftIdeasForMember,
-  addExclusionForMember,
   getMembersFromgroupID,
   setSecretSantaForMember,
-  getMySecretSanta,
   getAllSecretSantaGroups,
   removeSecretSantaGroup,
   getMember,
-  updateGiftIdeasLastUpdated,
-} = require('../db/secretSanta');
+  getMySecretSanta,
+} = require('../db/admin');
 
-const TableName = process.env.SECRET_SANTA_TABLE;
+const getAllGroups = async (ctx) => {
+  const allGroups = await getAllSecretSantaGroups();
+
+  const countMembers = ({ groupID }, data) =>
+    data.filter((d) => d.groupID === groupID).length;
+
+  const parsedGroups = allGroups
+    .reduce(
+      (acc, val, i, arr) => [
+        ...acc,
+        {
+          groupName: val.groupID,
+          count: countMembers(val, arr),
+        },
+      ],
+      []
+    )
+    .filter(
+      (group, index, arr) =>
+        arr.findIndex((t) => t.groupName === group.groupName) === index
+    );
+
+  ctx.body = parsedGroups;
+};
 
 const setupgroupID = async (ctx) => {
   const { groupID } = ctx.params;
@@ -48,62 +67,15 @@ const setupgroupID = async (ctx) => {
   });
 
   const payload = {
-    TableName,
     secretSantagroupID,
   };
 
   ctx.body = await setupSecretSantagroupID(payload);
 };
 
-const getGiftIdeas = async (ctx) => {
-  const { memberName, groupID } = ctx.params;
-
-  const payload = {
-    TableName,
-    memberName,
-    groupID,
-  };
-
-  const getGifts = await getGiftIdeasForMember(payload);
-  ctx.body = getGifts;
-};
-
-const addGiftIdeas = async (ctx) => {
-  const { memberName, groupID } = ctx.params;
-  const { giftIdeas } = ctx.request.body;
-
-  if (giftIdeas.length < 1) ctx.response.status = 404;
-
-  const payload = {
-    TableName,
-    memberName,
-    groupID,
-    giftIdeas: giftIdeas.map((g) => decodeURI(g)),
-  };
-
-  ctx.body = await addGiftIdeasForMember(payload);
-};
-
-const addExclusions = async (ctx) => {
-  const { memberName, groupID } = ctx.params;
-  const { exclusions } = ctx.request.body;
-
-  if (exclusions.length < 1) ctx.response.status = 404;
-
-  const payload = {
-    TableName,
-    memberName,
-    groupID,
-    exclusions,
-  };
-
-  ctx.body = await addExclusionForMember(payload);
-};
-
 const drawNames = async (ctx) => {
   const { groupID } = ctx.params;
   const secretSantaGroupMembersInfo = await getMembersFromgroupID({
-    TableName,
     groupID,
   });
 
@@ -115,13 +87,11 @@ const drawNames = async (ctx) => {
   );
 
   const drawHasBeenSavedToDB = await setSecretSantaForMember({
-    TableName,
     results,
     groupID,
   });
 
   const secretSantaGroupMembers = await getMembersFromgroupID({
-    TableName,
     groupID,
   });
 
@@ -140,47 +110,14 @@ const drawNames = async (ctx) => {
   ctx.body = drawHasBeenSavedToDB;
 };
 
-const getSecretSanta = async (ctx) => {
-  const { memberName, groupID } = ctx.params;
-
-  ctx.body = await getMySecretSanta({ TableName, memberName, groupID });
-};
-
-const getAllGroups = async (ctx) => {
-  const allGroups = await getAllSecretSantaGroups({ TableName });
-
-  const countMembers = ({ groupID }, data) =>
-    data.filter((d) => d.groupID === groupID).length;
-
-  const parsedGroups = allGroups
-    .reduce(
-      (acc, val, i, arr) => [
-        ...acc,
-        {
-          groupName: val.groupID,
-          count: countMembers(val, arr),
-        },
-      ],
-      []
-    )
-    .filter(
-      (group, index, arr) =>
-        arr.findIndex((t) => t.groupName === group.groupName) === index
-    );
-
-  ctx.body = parsedGroups;
-};
-
 const removeGroup = async (ctx) => {
   const { groupID } = ctx.params;
 
   const secretSantaGroupMembersToDelete = await getMembersFromgroupID({
-    TableName,
     groupID,
   });
 
   ctx.body = await removeSecretSantaGroup({
-    TableName,
     groupID,
     secretSantaGroupMembersToDelete,
   });
@@ -190,7 +127,6 @@ const sendEmailToMembers = async (ctx) => {
   const { groupID } = ctx.params;
 
   const secretSantaGroupMembers = await getMembersFromgroupID({
-    TableName,
     groupID,
   });
 
@@ -209,9 +145,7 @@ const sendEmailToMembers = async (ctx) => {
 const sendEmailToMember = async (ctx) => {
   const { groupID, memberName } = ctx.params;
 
-  const members = new Array(
-    await getMember({ TableName, memberName, groupID })
-  );
+  const members = new Array(await getMember({ memberName, groupID }));
 
   const response = await drawGenerated.sendEmail(groupID, members);
 
@@ -221,7 +155,7 @@ const sendEmailToMember = async (ctx) => {
 const getMembersFromGroup = async (ctx) => {
   const { groupID } = ctx.params;
 
-  const members = await getMembersFromgroupID({ TableName, groupID });
+  const members = await getMembersFromgroupID({ groupID });
 
   ctx.body = members.map(
     ({
@@ -242,30 +176,19 @@ const getMembersFromGroup = async (ctx) => {
   );
 };
 
-const setGiftIdeasLastUpdated = async (ctx) => {
+const getSecretSanta = async (ctx) => {
   const { memberName, groupID } = ctx.params;
-  const { giftIdeasLastUpdated } = ctx.request.body;
 
-  const payload = {
-    TableName,
-    memberName,
-    groupID,
-    giftIdeasLastUpdated,
-  };
-  ctx.body = await updateGiftIdeasLastUpdated(payload);
+  ctx.body = await getMySecretSanta({ memberName, groupID });
 };
 
 module.exports = {
-  setupgroupID,
-  addGiftIdeas,
-  addExclusions,
   drawNames,
-  getSecretSanta,
-  getGiftIdeas,
+  setupgroupID,
   getAllGroups,
   removeGroup,
   sendEmailToMembers,
   sendEmailToMember,
   getMembersFromGroup,
-  setGiftIdeasLastUpdated,
+  getSecretSanta,
 };

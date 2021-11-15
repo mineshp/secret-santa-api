@@ -9,19 +9,22 @@ const isAdmin = require('./middlewares/isAdmin');
 const errorHandler = require('./middlewares/errorHandler');
 
 const {
-  setupgroupID,
-  getGiftIdeas,
   addGiftIdeas,
   addExclusions,
+  getGiftIdeas,
+  setGiftIdeasLastUpdated,
+} = require('./handlers/wishlist');
+
+const {
   drawNames,
-  getSecretSanta,
+  setupgroupID,
   getAllGroups,
   removeGroup,
   sendEmailToMembers,
   sendEmailToMember,
   getMembersFromGroup,
-  setGiftIdeasLastUpdated
-} = require('./handlers/secretSanta');
+  getSecretSanta,
+} = require('./handlers/admin');
 
 const { login } = require('./handlers/auth');
 
@@ -52,7 +55,11 @@ router.post('/api/user/login', login);
 
 router.get('/api/reveal/:memberName/:groupID', jwt, getSecretSanta);
 router.get('/api/giftIdeas/:memberName/:groupID', jwt, getGiftIdeas);
-router.put('/api/giftIdeas/:memberName/:groupID/updated', jwt, setGiftIdeasLastUpdated);
+router.put(
+  '/api/giftIdeas/:memberName/:groupID/updated',
+  jwt,
+  setGiftIdeasLastUpdated
+);
 router.put('/api/giftIdeas/:memberName/:groupID', jwt, addGiftIdeas);
 router.put('/api/exclusions/:memberName/:groupID', jwt, addExclusions);
 
@@ -60,7 +67,12 @@ router.put('/api/exclusions/:memberName/:groupID', jwt, addExclusions);
 router.get('/api/admin/draw/:groupID', jwt, isAdmin, drawNames);
 router.get('/api/admin/allgroups', jwt, isAdmin, getAllGroups);
 router.get('/api/admin/sendEmail/:groupID', jwt, isAdmin, sendEmailToMembers);
-router.get('/api/admin/sendEmail/:groupID/:memberName', jwt, isAdmin, sendEmailToMember);
+router.get(
+  '/api/admin/sendEmail/:groupID/:memberName',
+  jwt,
+  isAdmin,
+  sendEmailToMember
+);
 router.get('/api/admin/:groupID', jwt, isAdmin, getMembersFromGroup);
 router.post('/api/admin/setup/:groupID', jwt, isAdmin, setupgroupID);
 router.delete('/api/admin/:groupID', jwt, isAdmin, removeGroup);
