@@ -9,20 +9,23 @@ const isAdmin = require('./middlewares/isAdmin');
 const errorHandler = require('./middlewares/errorHandler');
 
 const {
-  setupgroupID,
-  getGiftIdeas,
   addGiftIdeas,
   addExclusions,
+  getGiftIdeas,
+  setGiftIdeasLastUpdated,
+  showRandomSantaQuotes,
+} = require('./handlers/wishlist');
+
+const {
   drawNames,
-  getSecretSanta,
+  setupgroupID,
   getAllGroups,
   removeGroup,
   sendEmailToMembers,
   sendEmailToMember,
   getMembersFromGroup,
-  setGiftIdeasLastUpdated,
-  showRandomSantaQuotes,
-} = require('./handlers/secretSanta');
+  getSecretSanta,
+} = require('./handlers/admin');
 
 const { login } = require('./handlers/auth');
 
