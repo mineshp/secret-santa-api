@@ -1,6 +1,7 @@
 const getCode = require('../utilities/getCode');
-const { isValidgroupID } = require('../validator');
+const getQuotes = require('../utilities/quotes');
 const { getListOfNames, generateDraw } = require('../utilities/draw');
+const { isValidgroupID } = require('../validator');
 const drawGenerated = require('../email/drawGenerated');
 const {
   setupSecretSantagroupID,
@@ -255,6 +256,16 @@ const setGiftIdeasLastUpdated = async (ctx) => {
   ctx.body = await updateGiftIdeasLastUpdated(payload);
 };
 
+const showRandomSantaQuotes = async (ctx) => {
+  const quotes = getQuotes();
+  const getRandomQuotes = () => {
+    const randNum = Math.floor(Math.random() * quotes.length);
+    return JSON.stringify(quotes[randNum]);
+  };
+
+  ctx.body = getRandomQuotes();
+};
+
 module.exports = {
   setupgroupID,
   addGiftIdeas,
@@ -268,4 +279,5 @@ module.exports = {
   sendEmailToMember,
   getMembersFromGroup,
   setGiftIdeasLastUpdated,
+  showRandomSantaQuotes,
 };

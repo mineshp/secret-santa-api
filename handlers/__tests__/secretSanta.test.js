@@ -1,8 +1,10 @@
 const supertest = require('supertest');
 const jwt = require('jsonwebtoken');
 const lambda = require('../../services/lambda');
+const getQuotes = require('../../utilities/quotes');
 
 jest.mock('../../services/lambda');
+jest.mock('../../utilities/quotes');
 
 /* These env variables could also be done in a setupBeforeEnv.js file
 and added to jest config in package.json.
@@ -231,6 +233,14 @@ describe('secretSanta', () => {
     const { secretSanta } = JSON.parse(text);
     const myGiftee = decodedStr(secretSanta);
     expect(myGiftee).toEqual('testUser1');
+  });
+
+  it('gets quotes', async () => {
+    getQuotes.mockReturnValue(['foo', 'bar', 'baz']);
+    const { status, text } = await request.get('/api/displayQuotes');
+
+    expect(status).toEqual(200);
+    expect(JSON.parse(text)).toMatch(/^(foo|bar|baz)/);
   });
 
   it('draws names for a group', async () => {
