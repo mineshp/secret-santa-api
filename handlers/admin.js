@@ -182,16 +182,6 @@ const getSecretSanta = async (ctx) => {
   ctx.body = await getMySecretSanta({ memberName, groupID });
 };
 
-const showRandomSantaQuotes = async (ctx) => {
-  const quotes = getQuotes();
-  const getRandomQuotes = () => {
-    const randNum = Math.floor(Math.random() * quotes.length);
-    return JSON.stringify(quotes[randNum]);
-  };
-
-  ctx.body = getRandomQuotes();
-};
-
 module.exports = {
   drawNames,
   setupgroupID,

@@ -4,6 +4,7 @@ const {
   getGiftIdeasForMember,
   updateGiftIdeasLastUpdated,
 } = require('../db/wishlist');
+const getQuotes = require('../utilities/quotes');
 
 const addGiftIdeas = async (ctx) => {
   const { memberName, groupID } = ctx.params;
@@ -59,9 +60,20 @@ const setGiftIdeasLastUpdated = async (ctx) => {
   ctx.body = await updateGiftIdeasLastUpdated(payload);
 };
 
+const showRandomSantaQuotes = async (ctx) => {
+  const quotes = getQuotes();
+  const getRandomQuotes = () => {
+    const randNum = Math.floor(Math.random() * quotes.length);
+    return JSON.stringify(quotes[randNum]);
+  };
+
+  ctx.body = getRandomQuotes();
+};
+
 module.exports = {
   addGiftIdeas,
   addExclusions,
   getGiftIdeas,
   setGiftIdeasLastUpdated,
+  showRandomSantaQuotes,
 };
