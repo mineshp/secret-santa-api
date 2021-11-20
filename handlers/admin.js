@@ -11,6 +11,7 @@ const {
   getMember,
   getMySecretSanta,
   setSecretSantaRevealedFlag,
+  getSecretSantaRevealedFlag,
 } = require('../db/admin');
 
 const getAllGroups = async (ctx) => {
@@ -189,6 +190,12 @@ const setSecretSantaRevealed = async (ctx) => {
   ctx.body = await setSecretSantaRevealedFlag({ memberName, groupID });
 };
 
+const getSecretSantaRevealed = async (ctx) => {
+  const { memberName, groupID } = ctx.params;
+
+  ctx.body = await getSecretSantaRevealedFlag({ memberName, groupID });
+};
+
 module.exports = {
   drawNames,
   setupgroupID,
@@ -199,4 +206,5 @@ module.exports = {
   getMembersFromGroup,
   getSecretSanta,
   setSecretSantaRevealed,
+  getSecretSantaRevealed,
 };

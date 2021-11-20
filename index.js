@@ -26,6 +26,7 @@ const {
   getMembersFromGroup,
   getSecretSanta,
   setSecretSantaRevealed,
+  getSecretSantaRevealed,
 } = require('./handlers/admin');
 
 const { login } = require('./handlers/auth');
@@ -57,7 +58,16 @@ router.post('/api/user/login', login);
 
 router.get('/api/displayQuotes', showRandomSantaQuotes);
 router.get('/api/reveal/:memberName/:groupID', jwt, getSecretSanta);
-router.put('/api/reveal/:memberName/:groupID/', jwt, setSecretSantaRevealed);
+router.get(
+  '/api/reveal/:memberName/:groupID/status',
+  jwt,
+  getSecretSantaRevealed
+);
+router.put(
+  '/api/reveal/:memberName/:groupID/status',
+  jwt,
+  setSecretSantaRevealed
+);
 router.get('/api/giftIdeas/:memberName/:groupID', jwt, getGiftIdeas);
 router.put(
   '/api/giftIdeas/:memberName/:groupID/updated',

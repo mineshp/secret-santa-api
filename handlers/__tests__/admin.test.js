@@ -162,8 +162,8 @@ describe('secretSanta', () => {
 
   it('set secret santa revealed flag', async () => {
     const { status } = await request
-      .put('/api/reveal/testUser1/localTestGroup')
-      .set('Authorization', `Bearer ${adminTestToken}`);
+      .put('/api/reveal/testUser1/localTestGroup/status')
+      .set('Authorization', `Bearer ${nonAdminTestToken}`);
 
     const revealedStatusSet = await getMember(
       'testUser1',
@@ -173,6 +173,36 @@ describe('secretSanta', () => {
 
     expect(status).toEqual(200);
     expect(revealedStatusSet).toEqual({ revealedStatus: true });
+  });
+
+  it('get secret santa revealed flag after santa has NOT been revealed', async () => {
+    const { status, text } = await request
+      .get('/api/reveal/testUser2/localTestGroup/status')
+      .set('Authorization', `Bearer ${nonAdminTestToken}`);
+
+    expect(status).toEqual(200);
+    expect(JSON.parse(text)).toEqual({});
+  });
+
+  it('get secret santa revealed flag after santa has been revealed', async () => {
+    await request
+      .get('/api/admin/draw/localTestGroup')
+      .set('Authorization', `Bearer ${adminTestToken}`);
+
+    await request
+      .get('/api/reveal/testUser2/localTestGroup')
+      .set('Authorization', `Bearer ${nonAdminTestToken}`);
+
+    await request
+      .put('/api/reveal/testUser2/localTestGroup/status')
+      .set('Authorization', `Bearer ${nonAdminTestToken}`);
+
+    const { status, text } = await request
+      .get('/api/reveal/testUser2/localTestGroup/status')
+      .set('Authorization', `Bearer ${nonAdminTestToken}`);
+
+    expect(status).toEqual(200);
+    expect(JSON.parse(text)).toEqual({ revealedStatus: true });
   });
 
   it('gets quotes', async () => {
