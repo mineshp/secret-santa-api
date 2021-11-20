@@ -124,6 +124,22 @@ const getMySecretSanta = async ({ memberName, groupID }) => {
   }
 };
 
+const setSecretSantaRevealedFlag = async ({ memberName, groupID }) => {
+  const params = {
+    TableName,
+    Key: {
+      memberName,
+      groupID,
+    },
+    UpdateExpression: 'set revealedStatus = :ssr',
+    ExpressionAttributeValues: {
+      ':ssr': true,
+    },
+  };
+
+  return dbClient.update(params).catch((e) => JSON.stringify({ error: e }));
+};
+
 module.exports = {
   getMember,
   setSecretSantaForMember,
@@ -132,4 +148,5 @@ module.exports = {
   getAllSecretSantaGroups,
   removeSecretSantaGroup,
   getMySecretSanta,
+  setSecretSantaRevealedFlag,
 };

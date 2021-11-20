@@ -160,6 +160,21 @@ describe('secretSanta', () => {
     expect(myGiftee).toEqual('testUser1');
   });
 
+  it('set secret santa revealed flag', async () => {
+    const { status } = await request
+      .put('/api/reveal/testUser1/localTestGroup')
+      .set('Authorization', `Bearer ${adminTestToken}`);
+
+    const revealedStatusSet = await getMember(
+      'testUser1',
+      'localTestGroup',
+      'revealedStatus'
+    );
+
+    expect(status).toEqual(200);
+    expect(revealedStatusSet).toEqual({ revealedStatus: true });
+  });
+
   it('gets quotes', async () => {
     getQuotes.mockReturnValue(['foo', 'bar', 'baz']);
     const { status, text } = await request.get('/api/displayQuotes');
