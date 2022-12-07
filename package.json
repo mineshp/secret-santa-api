@@ -34,7 +34,7 @@
     "koa-convert": "^1.2.0",
     "koa-jwt": "^3.5.1",
     "koa-router": "^7.4.0",
-    "serverless": "^1.67.3",
+    "serverless": "^3.25.1",
     "serverless-http": "^1.8.0"
   },
   "devDependencies": {
